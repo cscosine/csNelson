@@ -1,4 +1,4 @@
-project(csNelson LANGUAGES CXX)
+project(csNelsonSamples LANGUAGES CXX)
 
 #---------------------------------------------------------------
 # prepare SamplesProblemLib
