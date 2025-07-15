@@ -1,6 +1,6 @@
 #pragma once
 
-#include "csBlockMatrix/Global.h"
+#include <csBlockMatrix/Global.hpp>
 
 #include "SolverCholeskySchur.h"
 #include "SolverDiagonalBlocksInverseSchur.h"

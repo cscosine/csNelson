@@ -1,10 +1,10 @@
 #pragma once
 #include "Global.h"
 
-#include "csBlockMatrix/Global.h"
-#include "csBlockMatrix/MatrixTypeTraits.h"
-#include "csBlockMatrix/SparsityPattern.h"
-#include "csBlockMatrix/VectorBlock.h"
+#include <csBlockMatrix/Global.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/SparsityPattern.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
 
 #include "BaseSection.h"
 #include "DoubleSectionHessian.h"

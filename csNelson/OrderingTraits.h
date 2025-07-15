@@ -1,7 +1,7 @@
 #pragma once
 
-#include "csBlockMatrix/Global.h"
 #include <Eigen/OrderingMethods>
+#include <csBlockMatrix/Global.hpp>
 
 namespace csNelson {
 

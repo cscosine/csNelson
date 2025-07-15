@@ -4,7 +4,7 @@
 #include "MatrixDenseWrapper.hpp"
 #include "MatrixSparseWrapper.hpp"
 
-#include "csBlockMatrix/VectorBlock.hpp"
+#include <csBlockMatrix/VectorBlock_impl.hpp>
 
 #include "DoubleSectionHessianMatrices.hpp"
 #include "SingleSectionHessian.hpp"

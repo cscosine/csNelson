@@ -1,8 +1,8 @@
 #pragma once
 #include "Global.h"
 
-#include "csBlockMatrix/MatrixBlockTypeTraits.h"
-#include "csBlockMatrix/MatrixTypeTraits.h"
+#include <csBlockMatrix/MatrixBlockTypeTraits.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
 
 namespace csNelson {
 

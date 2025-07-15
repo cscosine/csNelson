@@ -6,7 +6,7 @@
 #include <chrono>
 #include <fstream>
 
-#include "csBlockMatrix/SparsityPattern.h"
+#include <csBlockMatrix/SparsityPattern.hpp>
 #include <unordered_set>
 
 int main(int argc, char* argv[]) {

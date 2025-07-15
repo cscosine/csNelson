@@ -2,7 +2,7 @@
 #include "SolverCholeskySparse.h"
 
 #include "MatrixSparseWrapper.hpp"
-#include "csBlockMatrix/VectorBlock.hpp"
+#include <csBlockMatrix/VectorBlock_impl.hpp>
 
 namespace csNelson {
 

@@ -7,7 +7,7 @@
 #include <array>
 #include <vector>
 
-#include "csBlockMatrix/Global.h"
+#include <csBlockMatrix/Global.hpp>
 
 #include <Eigen/Core>
 

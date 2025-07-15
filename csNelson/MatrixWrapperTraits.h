@@ -1,7 +1,7 @@
 #pragma once
 #include "Global.h"
 
-#include "csBlockMatrix/Global.h"
+#include <csBlockMatrix/Global.hpp>
 
 #include "MatrixDenseWrapper.h"
 #include "MatrixSparseWrapper.h"

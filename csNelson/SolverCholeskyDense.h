@@ -2,8 +2,8 @@
 #include "Global.h"
 
 #include "MatrixDenseWrapper.h"
-#include "csBlockMatrix/MatrixTypeTraits.h"
-#include "csBlockMatrix/VectorBlock.h"
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
 
 #include <Eigen/Dense>
 

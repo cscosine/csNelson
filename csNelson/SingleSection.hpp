@@ -2,7 +2,7 @@
 #include "SingleSection.h"
 
 #include "SingleSectionHessian.hpp"
-#include "csBlockMatrix/VectorBlock.hpp"
+#include <csBlockMatrix/VectorBlock_impl.hpp>
 
 #include "EdgeBinary.hpp"
 #include "EdgeNary.hpp"

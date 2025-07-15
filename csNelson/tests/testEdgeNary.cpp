@@ -1,9 +1,9 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "csBlockMatrix/Global.h"
 #include "csNelson/EdgeNary.hpp"
 #include "csNelson/SingleSection.hpp"
+#include <csBlockMatrix/Global.hpp>
 
 struct Edge1 : public csNelson::EdgeNaryBase<1> {
 

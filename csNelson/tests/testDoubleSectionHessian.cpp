@@ -1,8 +1,8 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "csBlockMatrix/DenseMatrixBlock.hpp"
-#include "csBlockMatrix/SparsityPattern.h"
+#include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
+#include <csBlockMatrix/SparsityPattern.hpp>
 
 #include "csNelson/DoubleSectionHessian.hpp"
 

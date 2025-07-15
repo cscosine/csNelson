@@ -4,10 +4,10 @@
 #include "csNelson/MatrixDenseWrapper.hpp"
 #include "csNelson/MatrixDiagInv.hpp"
 
-#include "csBlockMatrix/DiagonalMatrixBlock.hpp"
-#include "csBlockMatrix/MatrixBlockDescriptor.hpp"
-#include "csBlockMatrix/SparseCoeffDiagonalMatrixBlock.hpp"
-#include "csBlockMatrix/VectorBlock.hpp"
+#include <csBlockMatrix/DiagonalMatrixBlock_impl.hpp>
+#include <csBlockMatrix/MatrixBlockDescriptor_impl.hpp>
+#include <csBlockMatrix/SparseCoeffDiagonalMatrixBlock_impl.hpp>
+#include <csBlockMatrix/VectorBlock_impl.hpp>
 
 #include <iostream>
 

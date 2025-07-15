@@ -1,7 +1,7 @@
 #pragma once
 #include "Global.h"
 
-#include "csBlockMatrix/MatrixTypeTraits.h"
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
 
 #include "ParallelExecHelper.h"
 

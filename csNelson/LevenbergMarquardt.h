@@ -6,7 +6,7 @@
 #include "SolverCholeskySparse.h"
 #include "SolverDiagonalBlocksInverseSchur.h"
 #include "SolverDiagonalBlocksInverseWWtMultSchur.h"
-#include "csBlockMatrix/Global.h"
+#include <csBlockMatrix/Global.hpp>
 
 #include "SolverTraits.h"
 

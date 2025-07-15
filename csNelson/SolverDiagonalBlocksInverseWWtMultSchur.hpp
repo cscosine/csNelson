@@ -1,7 +1,7 @@
 #pragma once
 #include "SolverDiagonalBlocksInverseWWtMultSchur.h"
 
-#include "csBlockMatrix/VectorBlock.hpp"
+#include <csBlockMatrix/VectorBlock_impl.hpp>
 
 #include "MatrixDiagInv.hpp"
 #include "MatrixWVinvMultiplier.hpp"
