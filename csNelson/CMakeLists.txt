@@ -84,30 +84,14 @@ cs_target_sources(csNelson
     LevenbergMarquardt.hpp
     OrderingTraits.h
 	PRIVATE
-    Global.cpp
     BaseSection.cpp
-    SingleSectionHessian.cpp
-    DoubleSectionHessian.cpp
-    SingleSection.cpp
-    DoubleSection.cpp
-    EdgeSectionBase.cpp
     EdgeInterface.cpp
     EdgeUnary.cpp
-    EdgeNary.cpp
     EdgeBinary.cpp
-    MatrixDenseWrapper.cpp
-    MatrixSparseWrapper.cpp
-    MatrixDiagInv.cpp
-    MatrixWWtMultiplier.cpp
-    MatrixWVinvMultiplier.cpp
-    MatrixWtXMultiplier.cpp
     GaussNewton.cpp
-    SolverCholeskyDense.cpp
     SolverCholeskySchur.cpp
-    SolverCholeskySparse.cpp
     SolverDiagonalBlocksInverseSchur.cpp
     SolverDiagonalBlocksInverseWWtMultSchur.cpp
-    ParallelExecHelper.cpp
     LevenbergMarquardt.cpp
 )
 
