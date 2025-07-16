@@ -1,114 +1,127 @@
 #pragma once
-#include "SolverDiagonalBlocksInverseSchur.h"
+#include <csNelson/Global.hpp>
 
-#include <csBlockMatrix/VectorBlock_impl.hpp>
+#include <csNelson/MatrixDenseWrapper.hpp>
+#include <csNelson/MatrixSparseWrapper.hpp>
 
-#include "MatrixDiagInv.hpp"
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
+
+#include <csNelson/DoubleSectionHessianMatrices.hpp>
+
+#include <csNelson/SingleSectionHessian.hpp>
+#include <csNelson/SolverCholeskyDense.hpp>
+#include <csNelson/SolverCholeskySparse.hpp>
+
+#include <csNelson/MatrixDiagInv.hpp>
+
+#include <csNelson/MatrixWrapperTraits.hpp>
+#include <csNelson/SolverTraitsBase.hpp>
+
+#include <Eigen/Dense>
+
+#include <csNelson/ParallelExecHelper.hpp>
+
+#include <chrono>
 
 namespace csNelson {
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType, int wrapperWType,
-          int choleskyOrderingS>
-SolverDiagonalBlocksInverseSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, wrapperUType, wrapperWType,
-                                 choleskyOrderingS>::SolverDiagonalBlocksInverseSchur()
-    : _firstTime(true)
-    , _v_maxAbsHDiag(-1)
-    , _settings(_matrixVInv.settings()) {}
+struct SolverDiagonalBlocksInverseSchurIterationTimeStat {
+  std::chrono::steady_clock::time_point t0_startIteration;
+  std::chrono::steady_clock::time_point t1_VInvComputed;
+  std::chrono::steady_clock::time_point t2_WRefreshed;
+  std::chrono::steady_clock::time_point t3_URefreshed;
+  std::chrono::steady_clock::time_point t4_bSComputed;
+  std::chrono::steady_clock::time_point t5_SComputed;
+  std::chrono::steady_clock::time_point t6_SSolveInit;
+  std::chrono::steady_clock::time_point t7_SFactorized;
+  std::chrono::steady_clock::time_point t8_bUComputed;
+  std::chrono::steady_clock::time_point t9_bVtildeComputed;
+  std::chrono::steady_clock::time_point t10_bVComputed;
+  std::string toString(const std::string& linePrefix = "") const;
+};
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType, int wrapperWType,
-          int choleskyOrderingS>
-void SolverDiagonalBlocksInverseSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, wrapperUType, wrapperWType,
-                                      choleskyOrderingS>::init(DoubleSectionHessianMatricesT& input,
-                                                               const DoubleSectionHessianVectorsT& b) {
-  _timeStats.startInit = std::chrono::steady_clock::now();
-
-  _matrixVInv.init(input.V());
-
-  _incVector.bU().resize(b.bU().segmentDescriptionCSPtr());
-  _incVector.bV().resize(b.bV().segmentDescriptionCSPtr());
-
-  _matrixW.set(&input.W());
-  _matrixU.set(&input.U());
-
-  // temporary
-  _v_maxAbsHDiag = Eigen::NumTraits<T>::lowest();
-  for (int c = 0; c < input.V().numBlocksCol(); c++) {
-    _v_maxAbsHDiag = std::max(_v_maxAbsHDiag, input.V().blockByUID(c).diagonal().cwiseAbs().maxCoeff());
+struct SolverDiagonalBlocksInverseSchurTimeStats {
+  std::chrono::steady_clock::time_point startInit;
+  std::chrono::steady_clock::time_point endInit;
+  std::vector<SolverDiagonalBlocksInverseSchurIterationTimeStat> iterations;
+  SolverDiagonalBlocksInverseSchurIterationTimeStat& lastIteration() {
+    return iterations.back();
   }
+  void addIteration() {
+    iterations.push_back(SolverDiagonalBlocksInverseSchurIterationTimeStat());
+  }
+  std::string toString(const std::string& linePrefix = "") const;
+};
 
-  _firstTime = true;
-  _timeStats.endInit = std::chrono::steady_clock::now();
-}
-
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType, int wrapperWType,
-          int choleskyOrderingS>
-T SolverDiagonalBlocksInverseSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, wrapperUType, wrapperWType,
-                                   choleskyOrderingS>::maxAbsHDiag() const {
-  return std::max(_v_maxAbsHDiag, _matrixU.mat().diagonal().cwiseAbs().maxCoeff());
-}
+struct SolverDiagonalBlocksInverseSchurSettings {
+  MatrixDiagInvSettings& settings;
+  SolverDiagonalBlocksInverseSchurSettings(MatrixDiagInvSettings& settings)
+      : settings(settings) {}
+};
 
 template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType, int wrapperWType,
           int choleskyOrderingS>
-bool SolverDiagonalBlocksInverseSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, wrapperUType, wrapperWType,
-                                      choleskyOrderingS>::computeIncrement(DoubleSectionHessianMatricesT& input,
-                                                                           const DoubleSectionHessianVectorsT& b, T relLambda,
-                                                                           T absLambda) {
-  _timeStats.addIteration();
-  _timeStats.lastIteration().t0_startIteration = std::chrono::steady_clock::now();
-  bool ok = true;
+class SolverDiagonalBlocksInverseSchur {
 
-  // V^-1
-  _matrixVInv.compute(input.V(), relLambda, absLambda);
+public:
+  using DoubleSectionHessianMatricesT = DoubleSectionHessianMatrices<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV>;
+  using DoubleSectionHessianVectorsT = DoubleSectionHessianVectors<T, BU, BV, NBU, NBV>;
 
-  _timeStats.lastIteration().t1_VInvComputed = std::chrono::steady_clock::now();
+  using Type = T;
 
-  // refresh (copy if needed)
-  _matrixW.refresh();
-  _timeStats.lastIteration().t2_WRefreshed = std::chrono::steady_clock::now();
-  _matrixU.refresh();
-  _timeStats.lastIteration().t3_URefreshed = std::chrono::steady_clock::now();
+  static constexpr bool hasSettings = true;
+  using Settings = SolverDiagonalBlocksInverseSchurSettings;
 
-  // bS = (-bU) - W * V^-1 * (-bV)
-  // note, change sing to bU
-  _bS = -b.bU().mat() - _matrixW.mat() * _matrixVInv.Vinv().mat() * (-b.bV().mat());
-  _timeStats.lastIteration().t4_bSComputed = std::chrono::steady_clock::now();
+private:
+  DoubleSectionHessianVectorsT _incVector;
 
-  // W * V^-1 * Wt
-  _matrixS = (_matrixU.mat() - (_matrixW.mat() * (_matrixVInv.Vinv().mat() * _matrixW.mat().transpose()).eval()));
+  typename DoubleSectionHessianVectorsT::VecTypeU::StorageType _bS;
+  typename DoubleSectionHessianVectorsT::VecTypeV::StorageType _bVtilde;
 
-  // add diagonal lambdas
-  if (relLambda != 0 || absLambda != 0) {
-    _matrixS.diagonal() += (relLambda * _matrixU.mat().diagonal());
-    _matrixS.diagonal().array() += absLambda;
+  MatrixDiagInv<matTypeV, T, BV, NBV, csBlockMatrix::BlockCoeffSparse> _matrixVInv;
+  typename MatrixWrapperTraits<wrapperWType>::template Wrapper<matTypeW, T, csBlockMatrix::RowMajor, BU, BV, NBU, NBV> _matrixW;
+
+  using MatrixUType =
+      typename MatrixWrapperTraits<wrapperUType>::template Wrapper<matTypeU, T, csBlockMatrix::ColMajor, BU, BU, NBU, NBU>;
+  MatrixUType _matrixU;
+  typename MatrixUType::MatOutputType _matrixS;
+
+  typename SolverTraits<wrapperUType>::template SolverEigen<typename MatrixUType::MatOutputType, choleskyOrderingS> _solverS;
+
+  bool _firstTime;
+  T _v_maxAbsHDiag;
+
+  Settings _settings;
+  SolverDiagonalBlocksInverseSchurTimeStats _timeStats;
+
+public:
+  SolverDiagonalBlocksInverseSchur();
+
+  Settings& settings() {
+    return _settings;
   }
-  _timeStats.lastIteration().t5_SComputed = std::chrono::steady_clock::now();
-
-  // solve!
-  if (_firstTime) {
-    _solverS.init(_matrixS);
-    _firstTime = false;
-  }
-  _timeStats.lastIteration().t6_SSolveInit = std::chrono::steady_clock::now();
-
-  _solverS.factorize(_matrixS);
-  _timeStats.lastIteration().t7_SFactorized = std::chrono::steady_clock::now();
-
-  _solverS.solve(_bS, _incVector.bU().mat());
-  _timeStats.lastIteration().t8_bUComputed = std::chrono::steady_clock::now();
-
-  // (-bV) - Wt * xu
-  _bVtilde = -b.bV().mat() - _matrixW.mat().transpose() * _incVector.bU().mat();
-  _timeStats.lastIteration().t9_bVtildeComputed = std::chrono::steady_clock::now();
-
-  _incVector.bV().mat() = _matrixVInv.Vinv().mat() * _bVtilde;
-  _timeStats.lastIteration().t10_bVComputed = std::chrono::steady_clock::now();
-
-  if (!ok) {
-    // defense
-    _incVector.setZero();
+  const Settings& settings() const {
+    return _settings;
   }
 
-  return ok;
-}
+  const SolverDiagonalBlocksInverseSchurTimeStats& timingStats() const {
+    return _timeStats;
+  }
+
+  void init(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b);
+
+  T maxAbsHDiag() const;
+
+  bool computeIncrement(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b, T relLambda, T absLambda);
+
+  const DoubleSectionHessianVectorsT& incrementVector() const {
+    return _incVector;
+  }
+
+  T incrementVectorSquaredNorm() const {
+    return _incVector.bU().mat().squaredNorm() + _incVector.bV().mat().squaredNorm();
+  }
+};
 
 } // namespace csNelson

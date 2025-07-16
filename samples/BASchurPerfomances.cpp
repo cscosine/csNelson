@@ -1,23 +1,23 @@
 #include <iostream>
 #include <vector>
 
-#include "Problems.h"
+#include <samples/Problems.hpp>
 
 #include <chrono>
 #include <fstream>
 
-#include "csNelson/DoubleSection.hpp"
-#include "csNelson/DoubleSectionHessian.hpp"
-#include "csNelson/EdgeBinary.hpp"
-#include "csNelson/EdgeUnary.hpp"
-#include "csNelson/GaussNewton.hpp"
-#include "csNelson/LevenbergMarquardt.hpp"
+#include <csNelson/DoubleSectionHessian_impl.hpp>
+#include <csNelson/DoubleSection_impl.hpp>
+#include <csNelson/EdgeBinary_impl.hpp>
+#include <csNelson/EdgeUnary_impl.hpp>
+#include <csNelson/GaussNewton_impl.hpp>
+#include <csNelson/LevenbergMarquardt_impl.hpp>
 
 #include <csCamera/Camera_impl.hpp>
 #include <csCamera/Utils_impl.hpp>
 
-#include "csLie/SE3_impl.hpp"
-#include "csLie/Utils_impl.hpp"
+#include <csLie/SE3_impl.hpp>
+#include <csLie/Utils_impl.hpp>
 
 constexpr int BR = 6;
 constexpr int BC = 3;

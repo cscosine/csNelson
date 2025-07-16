@@ -1,5 +1,5 @@
-#include "GaussNewton.h"
-#include "GaussNewton.hpp"
+#include <csNelson/GaussNewton.hpp>
+#include <csNelson/GaussNewton_impl.hpp>
 #include <sstream>
 
 #include <iomanip>

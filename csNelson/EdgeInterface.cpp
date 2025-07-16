@@ -1,4 +1,4 @@
-#include "EdgeInterface.h"
+#include <csNelson/EdgeInterface.hpp>
 
 namespace csNelson {
 

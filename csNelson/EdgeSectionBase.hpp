@@ -1,18 +1,31 @@
 #pragma once
-#include "EdgeSectionBase.h"
+#include <csNelson/Global.hpp>
+
+#include <cassert>
 
 namespace csNelson {
 
 template <class Section>
-EdgeSectionBase<Section>::EdgeSectionBase()
-    : _section(nullptr) {}
+class EdgeSectionBase {
 
-template <class Section>
-EdgeSectionBase<Section>::~EdgeSectionBase() {}
+  Section* _section;
 
-template <class Section>
-void EdgeSectionBase<Section>::setSection(Section* section) {
-  this->_section = section;
-}
+protected:
+  void setSection(Section* section);
+
+  Section& section() {
+    assert(_section != nullptr);
+    return *_section;
+  }
+
+public:
+  EdgeSectionBase();
+  virtual ~EdgeSectionBase();
+
+  const Section& section() const {
+    assert(_section != nullptr);
+    return *_section;
+  }
+};
 
 } // namespace csNelson

@@ -1,8 +1,8 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "csNelson/MatrixDenseWrapper.hpp"
-#include "csNelson/MatrixDiagInv.hpp"
+#include <csNelson/MatrixDenseWrapper_impl.hpp>
+#include <csNelson/MatrixDiagInv_impl.hpp>
 
 #include <csBlockMatrix/DiagonalMatrixBlock_impl.hpp>
 #include <csBlockMatrix/MatrixBlockDescriptor_impl.hpp>

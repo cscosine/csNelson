@@ -1,10 +1,10 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "testDoubleSectionCommon.hpp"
+#include <csNelson/testDoubleSectionCommon_impl.hpp>
 
-#include "csNelson/GaussNewton.hpp"
-#include "csNelson/LevenbergMarquardt.hpp"
+#include <csNelson/GaussNewton_impl.hpp>
+#include <csNelson/LevenbergMarquardt_impl.hpp>
 
 #include <array>
 #include <iostream>

@@ -1,126 +1,51 @@
 #pragma once
-#include "MatrixWtXMultiplier.h"
+#include <csNelson/Global.hpp>
 
-#include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
-#include <csBlockMatrix/DiagonalMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseCoeffDiagonalMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseCoeffMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseMatrixBlock_impl.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
 
-#include <csBlockMatrix/VectorBlock_impl.hpp>
+#include <csNelson/ParallelExecHelper.hpp>
 
-#include <cassert>
+#include <Eigen/Sparse>
+#include <vector>
 
 namespace csNelson {
 
-template <int matWType, class T, int BR, int BC, int NBR, int NBC>
-void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::prepare(const MatType& W,
-                                                                 const Eigen::SparseMatrix<int, Eigen::RowMajor>* spWmat) {
-  Eigen::SparseMatrix<int, Eigen::RowMajor> spMat_compute;
-  if (spWmat == nullptr) {
-    spMat_compute = W.sparsityPattern().toSparseMatrix();
-    spWmat = &spMat_compute;
-  }
-  const Eigen::SparseMatrix<int, Eigen::RowMajor>& spMat = *spWmat;
+namespace _private {
+struct UIDColPair {
+  int uid;
+  int xid;
+};
+} // namespace _private
 
-  Eigen::Matrix<int, 1, NBC> counts = Eigen::Matrix<int, 1, NBC>::Zero(W.numBlocksCol());
-  for (int r = 0; r < spMat.outerSize(); ++r) {
-    for (Eigen::SparseMatrix<int, Eigen::RowMajor>::InnerIterator it(spMat, r); it; ++it) {
-      counts(it.col())++;
-    }
-  }
-
-  _blocks.resize(W.numBlocksCol());
-  for (int i = 0; i < _blocks.size(); ++i) {
-    _blocks[i].resize(counts(i));
-  }
-
-  counts.setZero();
-  for (int r = 0; r < W.numBlocksRow(); ++r) {
-    for (auto it = W.rowBegin(r); it() != it.end(); it++) {
-      _blocks[it.col()][counts(it.col())].uid = it.blockUID();
-      _blocks[it.col()][counts(it.col())].xid = r;
-      counts(it.col())++;
-    }
-  }
-}
+using MatrixWtXMultiplierSettings = ParallelExecSettings;
 
 template <int matWType, class T, int BR, int BC, int NBR, int NBC>
-void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(const MatType& W,
-                                                                            const csBlockMatrix::VectorBlock<T, BR, NBR>& v,
-                                                                            csBlockMatrix::VectorBlock<T, BC, NBC>& res) const {
+class MatrixWtXMultiplier {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, T, csBlockMatrix::RowMajor, BR, BC, NBR, NBC>::MatrixType;
 
-  const auto& settings = _settings;
+  using Settings = MatrixWtXMultiplierSettings;
 
-  const int chunkSize = settings.chunkSize();
-  const int numEval = int(W.numBlocksRow());
-  const int reqNumThread = std::min(numEval, settings.maxNumThreads());
+private:
+  Settings _settings;
 
-  if (settings.isSingleThread() || reqNumThread == 1) {
-    for (int i = 0; i < _blocks.size(); ++i) {
-      for (int j = 0; j < _blocks[i].size(); ++j) {
-        res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-      }
-    }
-  } else {
-    // static
-    if (settings.schedule() == ParallelSchedule::schedule_static) {
-      if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      }
-    } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
-      if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      }
-    } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
-      if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
-        for (int i = 0; i < _blocks.size(); ++i) {
-          for (int j = 0; j < _blocks[i].size(); ++j) {
-            res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-          }
-        }
-      }
-    } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
-      for (int i = 0; i < _blocks.size(); ++i) {
-        for (int j = 0; j < _blocks[i].size(); ++j) {
-          res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
-        }
-      }
-    }
+  using UIDColPair = _private::UIDColPair;
+  std::vector<std::vector<UIDColPair>> _blocks;
+
+public:
+  Settings& settings() {
+    return _settings;
   }
-}
+  const Settings& settings() const {
+    return _settings;
+  }
+
+  void prepare(const MatType& W, const Eigen::SparseMatrix<int, Eigen::RowMajor>* spWmat = nullptr);
+
+  void rightMultVectorSub(const MatType& W, const csBlockMatrix::VectorBlock<T, BR, NBR>& v,
+                          csBlockMatrix::VectorBlock<T, BC, NBC>& res) const;
+};
 
 } // namespace csNelson

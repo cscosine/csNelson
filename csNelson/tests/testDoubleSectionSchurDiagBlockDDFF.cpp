@@ -1,7 +1,7 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "testDoubleSectionSchurCommon.hpp"
+#include <csNelson/testDoubleSectionSchurCommon_impl.hpp>
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
 class Points2d3dDDFF : public Points2d3dBase<Points2d3dDDFF<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,

@@ -1,5 +1,5 @@
-#include "SolverCholeskySchur.h"
-#include "SolverCholeskySchur.hpp"
+#include <csNelson/SolverCholeskySchur.hpp>
+#include <csNelson/SolverCholeskySchur_impl.hpp>
 
 #include <iomanip>
 #include <sstream>

@@ -1,6 +1,6 @@
-#include "Problems.h"
 #include <fstream>
 #include <iostream>
+#include <samples/Problems.hpp>
 
 #include <iomanip>
 #include <sstream>

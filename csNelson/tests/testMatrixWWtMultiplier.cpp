@@ -1,8 +1,8 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "csNelson/MatrixDenseWrapper.hpp"
-#include "csNelson/MatrixWWtMultiplier.hpp"
+#include <csNelson/MatrixDenseWrapper_impl.hpp>
+#include <csNelson/MatrixWWtMultiplier_impl.hpp>
 
 #include <iostream>
 

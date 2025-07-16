@@ -1,8 +1,8 @@
 #pragma once
-#include "csNelson/DoubleSection.hpp"
-#include "csNelson/DoubleSectionHessian.hpp"
-#include "csNelson/EdgeBinary.hpp"
-#include "csNelson/EdgeUnary.hpp"
+#include <csNelson/DoubleSectionHessian_impl.hpp>
+#include <csNelson/DoubleSection_impl.hpp>
+#include <csNelson/EdgeBinary_impl.hpp>
+#include <csNelson/EdgeUnary_impl.hpp>
 
 #include <array>
 #include <iostream>

@@ -1,57 +1,135 @@
 #pragma once
-#include "DoubleSectionHessian.h"
+#include <csNelson/Global.hpp>
 
-#include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
-#include <csBlockMatrix/DiagonalMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseCoeffDiagonalMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseCoeffMatrixBlock_impl.hpp>
-#include <csBlockMatrix/SparseMatrixBlock_impl.hpp>
+#include <csBlockMatrix/Global.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/SparsityPattern.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
 
-#include <csBlockMatrix/VectorBlock_impl.hpp>
-
-#include "DoubleSectionHessianMatrices.hpp"
+#include <csNelson/DoubleSectionHessianMatrices.hpp>
 
 namespace csNelson {
 
-template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::DoubleSectionHessian()
-    : _chi2(0) {}
+/*
+U  W
+W' V
+*/
 
-template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::~DoubleSectionHessian() {}
+template <int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
+struct DoubleSectionHessianTraits {
+  static constexpr int matTypeU = matTypeUv;
+  static constexpr int matTypeW = matTypeWv;
+  static constexpr int matTypeV = matTypeVv;
 
-template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-void DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::resize(
-    BlockSizeTypeParU blockSizesU, int nBlocksU, BlockSizeTypeParV blockSizesV, int nBlocksV,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spU,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spV,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr& spW) {
-  auto blockDescriptorU = MatTypeU::BlockDescriptor::squareMatrix(blockSizesU, nBlocksU);
-  _H.U().resize(blockDescriptorU, spU);
-  _b.bU().resize(blockDescriptorU.rowDescriptionCSPtr());
+  using Type = Tv;
 
-  auto blockDescriptorV = MatTypeV::BlockDescriptor::squareMatrix(blockSizesV, nBlocksV);
-  _H.V().resize(blockDescriptorV, spV);
-  _b.bV().resize(blockDescriptorV.rowDescriptionCSPtr());
+  static constexpr int BU = BUv;
+  static constexpr int BV = BVv;
+  static constexpr int NBU = NBUv;
+  static constexpr int NBV = NBVv;
 
-  auto blockDescriptorW =
-      typename MatTypeW::BlockDescriptor(blockDescriptorU.rowDescriptionCSPtr(), blockDescriptorV.colDescriptionCSPtr());
-  _H.W().resize(blockDescriptorW, spW);
-}
+  using HessianMatricesType = DoubleSectionHessianMatrices<matTypeUv, matTypeVv, matTypeWv, Tv, BUv, BVv, NBUv, NBVv>;
+  using HessianVectorsType = DoubleSectionHessianVectors<Tv, BUv, BVv, NBUv, NBVv>;
+};
 
-template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-void DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::clearAll() {
-  _chi2 = 0;
-  _H.U().setZero();
-  _H.V().setZero();
-  _H.W().setZero();
-  _b.bU().setZero();
-  _b.bV().setZero();
-}
+template <int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv, int BVv, int NBUv = csBlockMatrix::Dynamic,
+          int NBVv = csBlockMatrix::Dynamic>
+class DoubleSectionHessian {
+public:
+  using Traits = DoubleSectionHessianTraits<matTypeUv, matTypeVv, matTypeWv, Tv, BUv, BVv, NBUv, NBVv>;
 
-template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-Tv DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::maxAbsValBVect() const {
-  return std::max(_b.bU().mat().cwiseAbs().maxCoeff(), _b.bV().mat().cwiseAbs().maxCoeff());
-}
+  using HessianMatricesT = typename Traits::HessianMatricesType;
+  using HessianVectorsT = typename Traits::HessianVectorsType;
+
+  using MatTraitsU = typename HessianMatricesT::MatTraitsU;
+  using MatTraitsV = typename HessianMatricesT::MatTraitsV;
+  using MatTraitsW = typename HessianMatricesT::MatTraitsW;
+
+  using MatTypeU = typename MatTraitsU::MatrixType;
+  using MatTypeV = typename MatTraitsV::MatrixType;
+  using MatTypeW = typename MatTraitsW::MatrixType;
+
+  using VecTypeU = typename HessianVectorsT::VecTypeU;
+  using VecTypeV = typename HessianVectorsT::VecTypeV;
+
+  using BlockSizeTypeParU = typename MatTypeU::RowTraits::BlockSizeTypePar;
+  using BlockSizeTypeParV = typename MatTypeV::RowTraits::BlockSizeTypePar;
+
+private:
+  HessianMatricesT _H;
+
+  HessianVectorsT _b;
+
+  double _chi2;
+
+public:
+  DoubleSectionHessian();
+  virtual ~DoubleSectionHessian();
+
+  void resize(BlockSizeTypeParU blockSizesU, int nBlocksU, BlockSizeTypeParV blockSizesV, int nBlocksV,
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spU,
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spV,
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr& spW);
+
+  HessianMatricesT& H() {
+    return _H;
+  }
+  const HessianMatricesT& H() const {
+    return _H;
+  }
+
+  HessianVectorsT& b() {
+    return _b;
+  }
+  const HessianVectorsT& b() const {
+    return _b;
+  }
+
+  inline void setChi2(double chi2) {
+    this->_chi2 = chi2;
+  }
+
+  inline double chi2() const {
+    return _chi2;
+  }
+
+  inline const MatTypeU& U() const {
+    return _H.U();
+  }
+  inline const MatTypeV& V() const {
+    return _H.V();
+  }
+  inline const MatTypeW& W() const {
+    return _H.W();
+  }
+
+  inline MatTypeU& U() {
+    return _H.U();
+  }
+  inline MatTypeV& V() {
+    return _H.V();
+  }
+  inline MatTypeW& W() {
+    return _H.W();
+  }
+
+  inline const VecTypeU& bU() const {
+    return _b.bU();
+  }
+  inline const VecTypeV& bV() const {
+    return _b.bV();
+  }
+
+  inline VecTypeU& bU() {
+    return _b.bU();
+  }
+  inline VecTypeV& bV() {
+    return _b.bV();
+  }
+
+  void clearAll();
+
+  Tv maxAbsValBVect() const;
+};
 
 } // namespace csNelson

@@ -31,58 +31,58 @@ cs_find_package(csNelson PUBLIC csBlockMatrix COMPONENTS csBlockMatrix REQUIRED)
 
 cs_target_sources(csNelson
 	PRIVATE_INSTALL
-    Global.h
-    BaseSection.h
-    SingleSectionHessian.h
+    Global.hpp
+    BaseSection.hpp
     SingleSectionHessian.hpp
-    DoubleSectionHessianMatrices.h
+    SingleSectionHessian_impl.hpp
     DoubleSectionHessianMatrices.hpp
-    DoubleSectionHessian.h
+    DoubleSectionHessianMatrices_impl.hpp
     DoubleSectionHessian.hpp
-    SingleSection.h
+    DoubleSectionHessian_impl.hpp
     SingleSection.hpp
-    DoubleSection.h
+    SingleSection_impl.hpp
     DoubleSection.hpp
-    EdgeInterface.h
-    EdgeSectionBase.h
+    DoubleSection_impl.hpp
+    EdgeInterface.hpp
     EdgeSectionBase.hpp
-    EdgeNary.h
+    EdgeSectionBase_impl.hpp
     EdgeNary.hpp
-    EdgeUnary.h
+    EdgeNary_impl.hpp
     EdgeUnary.hpp
-    EdgeBinary.h
+    EdgeUnary_impl.hpp
     EdgeBinary.hpp
-    MatrixWrapperTraits.h
-    MatrixDenseWrapper.h
+    EdgeBinary_impl.hpp
+    MatrixWrapperTraits.hpp
     MatrixDenseWrapper.hpp
-    MatrixSparseWrapper.h
+    MatrixDenseWrapper_impl.hpp
     MatrixSparseWrapper.hpp
-    MatrixDiagInv.h
+    MatrixSparseWrapper_impl.hpp
     MatrixDiagInv.hpp
-    MatrixWWtMultiplier.h
+    MatrixDiagInv_impl.hpp
     MatrixWWtMultiplier.hpp
-    MatrixWVinvMultiplier.h
+    MatrixWWtMultiplier_impl.hpp
     MatrixWVinvMultiplier.hpp
-    MatrixWtXMultiplier.h
+    MatrixWVinvMultiplier_impl.hpp
     MatrixWtXMultiplier.hpp
-    GaussNewton.h
+    MatrixWtXMultiplier_impl.hpp
     GaussNewton.hpp
-    SolverCholeskyDense.h
+    GaussNewton_impl.hpp
     SolverCholeskyDense.hpp
-    SolverCholeskySchur.h
+    SolverCholeskyDense_impl.hpp
     SolverCholeskySchur.hpp
-    SolverCholeskySparse.h
+    SolverCholeskySchur_impl.hpp
     SolverCholeskySparse.hpp
-    SolverDiagonalBlocksInverseSchur.h
+    SolverCholeskySparse_impl.hpp
     SolverDiagonalBlocksInverseSchur.hpp
-    SolverDiagonalBlocksInverseWWtMultSchur.h
+    SolverDiagonalBlocksInverseSchur_impl.hpp
     SolverDiagonalBlocksInverseWWtMultSchur.hpp
-    SolverTraitsBase.h
-    SolverTraits.h
-    ParallelExecHelper.h
-    LevenbergMarquardt.h
+    SolverDiagonalBlocksInverseWWtMultSchur_impl.hpp
+    SolverTraitsBase.hpp
+    SolverTraits.hpp
+    ParallelExecHelper.hpp
     LevenbergMarquardt.hpp
-    OrderingTraits.h
+    LevenbergMarquardt_impl.hpp
+    OrderingTraits.hpp
 	PRIVATE
     BaseSection.cpp
     EdgeInterface.cpp

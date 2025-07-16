@@ -1,91 +1,87 @@
 #pragma once
-#include "SolverCholeskyDense.h"
+#include <csNelson/Global.hpp>
 
-#include "MatrixDenseWrapper.hpp"
-#include <csBlockMatrix/VectorBlock_impl.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
+#include <csNelson/MatrixDenseWrapper.hpp>
+
+#include <Eigen/Dense>
 
 namespace csNelson {
 
 template <class EigenMatType>
-void SolverCholeskyEigenDense<EigenMatType>::init(EigenMatType& mat) {}
+class SolverCholeskyEigenDense {
+  Eigen::LDLT<EigenMatType, Eigen::Upper> _ldlt;
 
-template <class EigenMatType>
-bool SolverCholeskyEigenDense<EigenMatType>::factorize(EigenMatType& matInput) {
-  this->_ldlt.compute(matInput);
-  return this->_ldlt.info() == Eigen::ComputationInfo::Success;
-}
+public:
+  void init(EigenMatType& mat);
 
-template <class EigenMatType>
-template <class Derived1, class Derived2>
-void SolverCholeskyEigenDense<EigenMatType>::solve(const Eigen::MatrixBase<Derived1>& b, Eigen::MatrixBase<Derived2>& x) {
-  x = this->_ldlt.solve(b);
-}
+  bool factorize(EigenMatType& matInput);
 
-//---------------------------------------------------------------------------------------------------
+  template <class Derived1, class Derived2>
+  void solve(const Eigen::MatrixBase<Derived1>& b, Eigen::MatrixBase<Derived2>& x);
+};
 
-template <int matTypeV, class T, int B, int NB>
-void SolverCholeskyDenseBase<matTypeV, T, B, NB>::init(MatType& input, const csBlockMatrix::VectorBlock<T, B, NB>& b) {
-  _denseWrapper.set(&input);
-}
+//--------------------------------------------------------------------------------------
+template <int matTypeV, class T, int B, int NB = csBlockMatrix::Dynamic>
+class SolverCholeskyDenseBase {
 
-template <int matTypeV, class T, int B, int NB>
-T SolverCholeskyDenseBase<matTypeV, T, B, NB>::maxAbsHDiag() const {
-  return _denseWrapper.maxAbsDiag();
-}
+public:
+  using MatTraits = csBlockMatrix::MatrixBlockIterableTypeTraits<matTypeV, T, csBlockMatrix::ColMajor, B, B, NB, NB>;
+  using MatType = typename MatTraits::MatrixType;
+  using VecType = csBlockMatrix::VectorBlock<T, B, NB>;
 
-template <int matTypeV, class T, int B, int NB>
-bool SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(MatType& input, const csBlockMatrix::VectorBlock<T, B, NB>& b,
-                                                                   T relLambda, T absLambda, VecType& result) {
-  _denseWrapper.refresh();
+  using DenseWrapperT = DenseSquareWrapper<matTypeV, T, csBlockMatrix::ColMajor, B, NB>;
+  using DiagType = typename DenseWrapperT::DiagType;
 
-  if (relLambda != 0 || absLambda != 0) {
-    if (_diagBackup.size() != _denseWrapper.mat().rows()) {
-      _diagBackup.resize(_denseWrapper.mat().rows());
-    }
-    // backup diagonal
-    _denseWrapper.diagonalCopy(_diagBackup);
-    // change the diagonal values
-    _denseWrapper.setDiagonal((_diagBackup.array() * (1 + relLambda)).array() + absLambda);
+  using Type = T;
+
+  static constexpr bool hasSettings = false;
+  class Settings {};
+
+private:
+  DenseWrapperT _denseWrapper;
+  DiagType _diagBackup;
+
+  Eigen::LDLT<typename DenseWrapperT::MatOutputType, Eigen::Upper> _ldlt;
+
+public:
+  virtual void init(MatType& input, const VecType& b);
+
+  T maxAbsHDiag() const;
+
+  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda, VecType& result);
+
+  template <class Derived>
+  const Eigen::Solve<Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
+                     Derived>
+  solve(const Eigen::MatrixBase<Derived>& b) const;
+
+  Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> solve(const Eigen::SparseMatrix<T>& b) const;
+};
+
+//--------------------------------------------------------------------------------------
+template <int matTypeV, class T, int B, int NB = csBlockMatrix::Dynamic>
+class SolverCholeskyDense : public SolverCholeskyDenseBase<matTypeV, T, B, NB> {
+public:
+  using VecType = typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::VecType;
+  using MatType = typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::MatType;
+
+private:
+  VecType _incVector;
+
+public:
+  void init(MatType& input, const VecType& b) override;
+
+  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda);
+
+  const VecType& incrementVector() const {
+    return _incVector;
   }
 
-  this->_ldlt.compute(_denseWrapper.mat());
-
-  if (this->_ldlt.info() == Eigen::ComputationInfo::Success) {
-    result.mat() = this->_ldlt.solve(-b.mat());
+  T incrementVectorSquaredNorm() const {
+    return _incVector.mat().squaredNorm();
   }
-
-  // restore diagonal values
-  if (relLambda != 0 || absLambda != 0) {
-    _denseWrapper.setDiagonal(_diagBackup);
-  }
-
-  return this->_ldlt.info() == Eigen::ComputationInfo::Success;
-}
-
-template <int matTypeV, class T, int B, int NB>
-template <class Derived>
-const Eigen::Solve<Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
-                   Derived>
-SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::MatrixBase<Derived>& b) const {
-  return this->_ldlt.solve(b);
-}
-
-template <int matTypeV, class T, int B, int NB>
-Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
-SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::SparseMatrix<T>& b) const {
-  return this->_ldlt.solve(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>(b));
-}
-
-//---------------------------------------------------------------------------------------------------
-
-template <int matTypeV, class T, int B, int NB>
-void SolverCholeskyDense<matTypeV, T, B, NB>::init(MatType& input, const VecType& b) {
-  SolverCholeskyDenseBase<matTypeV, T, B, NB>::init(input, b);
-  _incVector.resize(b.segmentDescriptionCSPtr());
-}
-template <int matTypeV, class T, int B, int NB>
-bool SolverCholeskyDense<matTypeV, T, B, NB>::computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda) {
-  return SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(input, b, relLambda, absLambda, _incVector);
-}
+};
 
 } // namespace csNelson

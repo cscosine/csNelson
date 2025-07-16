@@ -1,5 +1,5 @@
-#include "SolverDiagonalBlocksInverseSchur.h"
-#include "SolverDiagonalBlocksInverseSchur.hpp"
+#include <csNelson/SolverDiagonalBlocksInverseSchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseSchur_impl.hpp>
 
 #include <iomanip>
 #include <sstream>

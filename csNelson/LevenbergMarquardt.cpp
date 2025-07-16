@@ -1,5 +1,5 @@
-#include "LevenbergMarquardt.h"
-#include "LevenbergMarquardt.hpp"
+#include <csNelson/LevenbergMarquardt.hpp>
+#include <csNelson/LevenbergMarquardt_impl.hpp>
 
 namespace csNelson {
 

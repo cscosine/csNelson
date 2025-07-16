@@ -1,5 +1,5 @@
-#include "EdgeBinary.h"
-#include "EdgeBinary.hpp"
+#include <csNelson/EdgeBinary.hpp>
+#include <csNelson/EdgeBinary_impl.hpp>
 
 namespace csNelson {
 

@@ -4,15 +4,15 @@
 #include <catch2/catch_template_test_macros.hpp>
 #include <catch2/catch_test_macros.hpp>
 
-#include "csNelson/EdgeBinary.hpp"
-#include "csNelson/GaussNewton.hpp"
-#include "csNelson/LevenbergMarquardt.hpp"
-#include "csNelson/SingleSection.hpp"
+#include <csNelson/EdgeBinary_impl.hpp>
+#include <csNelson/GaussNewton_impl.hpp>
+#include <csNelson/LevenbergMarquardt_impl.hpp>
+#include <csNelson/SingleSection_impl.hpp>
 
-#include "lie/SE2.h"
-#include "lie/SE2Alg.h"
-#include "lie/SE2Exp.h"
-#include "lie/SE2Params.h"
+#include <csNelson/lie/SE2.hpp>
+#include <csNelson/lie/SE2Alg.hpp>
+#include <csNelson/lie/SE2Exp.hpp>
+#include <csNelson/lie/SE2Params.hpp>
 
 #include <array>
 #include <vector>

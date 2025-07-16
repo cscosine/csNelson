@@ -1,94 +1,227 @@
 #pragma once
-#include "MatrixDenseWrapper.h"
+#include <csNelson/Global.hpp>
+
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
 
 namespace csNelson {
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-DenseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
-
-//---------------------------------------------------------------------------------------------------
+template <int matType, class T, int Ordering, int BR, int BC, int NBR = csBlockMatrix::Dynamic, int NBC = csBlockMatrix::Dynamic>
+class DenseWrapper {};
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-DenseWrapper<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
-//---------------------------------------------------------------------------------------------------
+class DenseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+  using MatOutputType = typename MatType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockDense;
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-DenseWrapper<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
+private:
+  MatType* _matrix;
 
-//---------------------------------------------------------------------------------------------------
+public:
+  DenseWrapper()
+      : _matrix(nullptr) {}
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
+  virtual ~DenseWrapper();
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
-  this->_matrix = matrix;
-  this->_matCopy.resize(this->_matrix->blockDescriptor());
-  this->_matCopy.setZero();
-  this->refresh();
-}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::refresh() {
-  assert(this->_matrix != nullptr);
-  for (int cb = 0; cb < this->_matrix->outerSize(); cb++) {
-    for (auto it = this->_matrix->begin(cb); it() != it.end(); it++) {
-      this->_matCopy.block(it.row(), it.col()) = it.block();
-    }
+  void set(MatType* matrix) {
+    this->_matrix = matrix;
   }
-}
 
-//---------------------------------------------------------------------------------------------------
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
-  this->_matrix = matrix;
-  this->_matCopy.resize(this->_matrix->blockDescriptor());
-  this->_matCopy.setZero();
-  this->refresh();
-}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::refresh() {
-  assert(this->_matrix != nullptr);
-  for (int cb = 0; cb < this->_matrix->outerSize(); cb++) {
-    for (auto it = this->_matrix->begin(cb); it() != it.end(); it++) {
-      this->_matCopy.block(it.row(), it.col()) = it.block();
-    }
+  void refresh() {
+    // no need, direct pointing to matrix
   }
-}
 
-//------------------------------------------------------------------------------------------------------------
-template <int matType, class T, int Ordering, int BR, int NBR>
-DenseSquareWrapper<matType, T, Ordering, BR, NBR>::DenseSquareWrapper()
-    : DenseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>() {}
-template <int matType, class T, int Ordering, int BR, int NBR>
-DenseSquareWrapper<matType, T, Ordering, BR, NBR>::~DenseSquareWrapper() {}
+  const MatOutputType& mat() const {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+  MatOutputType& mat() {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+};
 
-template <int matType, class T, int Ordering, int BR, int NBR>
-typename DenseSquareWrapper<matType, T, Ordering, BR, NBR>::DiagType
-DenseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonal() const {
-  return this->mat().diagonal();
-}
+template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
+class DenseWrapper<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR,
+                                                                        NBC>::MatrixType;
+  using MatCopyType = typename csBlockMatrix::MatrixBlockTypeTraits<csBlockMatrix::BlockDense, T, BR, BC, NBR, NBC>::StorageType;
 
-template <int matType, class T, int Ordering, int BR, int NBR>
-T DenseSquareWrapper<matType, T, Ordering, BR, NBR>::maxAbsDiag() const {
-  return this->mat().diagonal().cwiseAbs().maxCoeff();
-}
+  using MatOutputType = MatCopyType;
+  static constexpr int matOutputType = csBlockMatrix::BlockDense;
 
-template <int matType, class T, int Ordering, int BR, int NBR>
-template <class Derived>
-void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived>& dest) const {
-  assert(dest.size() == this->mat().diagonal().size());
-  dest = this->mat().diagonal();
-}
+private:
+  // the original matrix
+  MatType* _matrix;
 
-template <int matType, class T, int Ordering, int BR, int NBR>
-template <class Derived>
-void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived>& values) {
-  this->mat().diagonal() = values;
-}
+  // the eigen dense copy
+  MatCopyType _matCopy;
+
+public:
+  DenseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~DenseWrapper();
+
+  void set(MatType* matrix) {
+    this->_matrix = matrix;
+    _matCopy.setZero(this->_matrix->mat().rows(), this->_matrix->mat().cols());
+    this->refresh();
+  }
+
+  void refresh() {
+    assert(this->_matrix != nullptr);
+    _matCopy = MatCopyType(_matrix->mat());
+  }
+
+  const MatCopyType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+  MatCopyType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+};
+
+template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
+class DenseWrapper<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC,
+                                                                        NBR, NBC>::MatrixType;
+  using MatCopyType = typename csBlockMatrix::MatrixBlockTypeTraits<csBlockMatrix::BlockDense, T, BR, BC, NBR, NBC>::StorageType;
+
+  using MatOutputType = MatCopyType;
+  static constexpr int matOutputType = csBlockMatrix::BlockDense;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the eigen dense copy
+  MatCopyType _matCopy;
+
+public:
+  DenseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~DenseWrapper();
+
+  void set(MatType* matrix) {
+    this->_matrix = matrix;
+    _matCopy.setZero(this->_matrix->mat().rows(), this->_matrix->mat().cols());
+    this->refresh();
+  }
+
+  void refresh() {
+    assert(this->_matrix != nullptr);
+    _matCopy = MatCopyType(_matrix->mat());
+  }
+
+  const MatCopyType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+  MatCopyType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+};
+
+template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
+class DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+  using MatCopyType = csBlockMatrix::DenseMatrixBlock<T, BR, BC, NBR, NBC>;
+  using MatOutputType = typename MatCopyType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockDense;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the eigen dense copy
+  MatCopyType _matCopy;
+
+public:
+  DenseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~DenseWrapper();
+
+  void set(MatType* matrix);
+
+  void refresh();
+
+  const typename MatCopyType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+  typename MatCopyType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+};
+
+template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
+class DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+  using MatCopyType = csBlockMatrix::DenseMatrixBlock<T, BR, BC, NBR, NBC>;
+  using MatOutputType = typename MatCopyType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockDense;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the eigen dense copy
+  MatCopyType _matCopy;
+
+public:
+  DenseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~DenseWrapper();
+
+  void set(MatType* matrix);
+
+  void refresh();
+
+  const typename MatCopyType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+  typename MatCopyType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+};
+
+//----------------------------------------------------------------------------------
+
+template <int matType, class T, int Ordering, int BR, int NBR = csBlockMatrix::Dynamic>
+class DenseSquareWrapper : public DenseWrapper<matType, T, Ordering, BR, BR, NBR, NBR> {
+public:
+  using MatType = typename DenseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>::MatType;
+  using DiagType = typename csBlockMatrix::VectorBlockTraits<T, BR, NBR>::StorageType;
+
+  DenseSquareWrapper();
+  virtual ~DenseSquareWrapper();
+
+  DiagType diagonal() const;
+  T maxAbsDiag() const;
+
+  template <class Derived>
+  void diagonalCopy(Eigen::DenseBase<Derived>& dest) const;
+
+  template <class Derived>
+  void setDiagonal(const Eigen::DenseBase<Derived>& values);
+};
 
 } // namespace csNelson

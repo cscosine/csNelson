@@ -1,5 +1,5 @@
-#include "csNelson/Global.h"
-#include "csNelson/SingleSectionHessian.hpp"
+#include <csNelson/Global.hpp>
+#include <csNelson/SingleSectionHessian_impl.hpp>
 
 #include <atomic>
 #include <iostream>

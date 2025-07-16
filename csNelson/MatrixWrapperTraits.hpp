@@ -1,10 +1,10 @@
 #pragma once
-#include "Global.h"
+#include <csNelson/Global.hpp>
 
 #include <csBlockMatrix/Global.hpp>
 
-#include "MatrixDenseWrapper.h"
-#include "MatrixSparseWrapper.h"
+#include <csNelson/MatrixDenseWrapper.hpp>
+#include <csNelson/MatrixSparseWrapper.hpp>
 
 namespace csNelson {
 

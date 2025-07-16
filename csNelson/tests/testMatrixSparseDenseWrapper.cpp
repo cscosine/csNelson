@@ -4,9 +4,9 @@
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
 #include <csBlockMatrix/SparsityPattern.hpp>
 
-#include "csNelson/MatrixDenseWrapper.hpp"
-#include "csNelson/MatrixSparseWrapper.hpp"
-#include "csNelson/SingleSectionHessian.hpp"
+#include <csNelson/MatrixDenseWrapper_impl.hpp>
+#include <csNelson/MatrixSparseWrapper_impl.hpp>
+#include <csNelson/SingleSectionHessian_impl.hpp>
 
 static constexpr int secSizeFix = 3;
 

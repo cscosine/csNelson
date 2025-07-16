@@ -1,14 +1,14 @@
 #include <iostream>
 #include <vector>
 
-#include "Problems.h"
+#include <samples/Problems.hpp>
 
 #include <chrono>
 #include <fstream>
 
-#include "csNelson/MatrixDenseWrapper.hpp"
-#include "csNelson/MatrixSparseWrapper.hpp"
-#include "csNelson/MatrixWVinvMultiplier.hpp"
+#include <csNelson/MatrixDenseWrapper_impl.hpp>
+#include <csNelson/MatrixSparseWrapper_impl.hpp>
+#include <csNelson/MatrixWVinvMultiplier_impl.hpp>
 
 constexpr int BR = 6;
 constexpr int BC = 3;

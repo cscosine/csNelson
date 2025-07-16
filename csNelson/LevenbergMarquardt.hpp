@@ -1,134 +1,143 @@
 #pragma once
-#include "LevenbergMarquardt.h"
+#include <csNelson/Global.hpp>
 
-#include "SolverCholeskyDense.hpp"
-#include "SolverCholeskySchur.hpp"
-#include "SolverCholeskySparse.hpp"
-#include "SolverDiagonalBlocksInverseSchur.hpp"
-#include "SolverDiagonalBlocksInverseWWtMultSchur.hpp"
+#include <csBlockMatrix/Global.hpp>
+#include <csNelson/SolverCholeskyDense.hpp>
+#include <csNelson/SolverCholeskySchur.hpp>
+#include <csNelson/SolverCholeskySparse.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseSchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseWWtMultSchur.hpp>
+
+#include <csNelson/SolverTraits.hpp>
+
+#include <string>
+#include <vector>
 
 namespace csNelson {
 
-template <class Solver>
-LevenbergMarquardt<Solver>::LevenbergMarquardt()
-    : iter(-1)
-    , subiter(-1) {}
+struct LevenbergMarquardtSettings {
+  int maxNumIt;
+  int maxNumSubIt;
+  int minNumIt;
+  double epsBVector;
+  double epsIncSquare;
+  double epsChi2;
+  double tau;
+  double penaltyV;
+  double initV;
+  double maxScaleFactor;
+  double minScaleFactor;
+
+  LevenbergMarquardtSettings();
+  virtual ~LevenbergMarquardtSettings();
+};
+
+enum class LevenbergMarquardtTerminationReason {
+  SuccessAtStart,
+  SuccessSmallIncrement,
+  SuccessEpsB,
+  SuccessSmallResiduals,
+  SolverFailure,
+  MaxIterationReached,
+  MaxSubIterationReached
+};
+
+class LevenbergMarquardtUtils {
+  static const std::vector<std::string> _terminationReasonStrings;
+
+public:
+  static bool success(LevenbergMarquardtTerminationReason lm);
+  static std::string toString(LevenbergMarquardtTerminationReason lm);
+};
+
+//------------------------------------------------------------------------------------------------------
+
+class LevenbergMarquardtStats {
+public:
+  struct InStats {
+    int subit;
+    double chi2;
+  };
+  struct OutStats {
+    int it;
+    std::vector<InStats> subit;
+    OutStats(int it, int reserveIn)
+        : it(it) {
+      subit.reserve(reserveIn);
+    }
+  };
+
+private:
+  std::vector<OutStats> _stats;
+  int _reserveInStats;
+
+public:
+  LevenbergMarquardtStats();
+  virtual ~LevenbergMarquardtStats();
+
+  void reserve(int reserveOut, int reserveInStats);
+
+  void addIteration(int it);
+  void addSubIteration(int subit, double chi2);
+  std::string toString() const;
+};
+
+//------------------------------------------------------------------------------------------------------
 
 template <class Solver>
-LevenbergMarquardt<Solver>::LevenbergMarquardt(const LevenbergMarquardtSettings& settings)
-    : _settings(settings)
-    , iter(-1)
-    , subiter(-1) {}
+class LevenbergMarquardt {
 
-template <class Solver>
-LevenbergMarquardt<Solver>::~LevenbergMarquardt() {}
+  Solver _solver;
 
-template <class Solver>
-template <class OptimizationProblem>
-LevenbergMarquardtTerminationReason LevenbergMarquardt<Solver>::solve(OptimizationProblem& op) {
+  LevenbergMarquardtSettings _settings;
+  int iter;
+  int subiter;
 
-  _stats.reserve(_settings.maxNumIt, _settings.maxNumSubIt);
+  LevenbergMarquardtStats _stats;
 
-  // compute initial error
-  op.update(true);
-  _stats.addIteration(iter);
-  _stats.addSubIteration(subiter, op.hessian().chi2());
+public:
+  using Utils = LevenbergMarquardtUtils;
+  using Settings = LevenbergMarquardtSettings;
+  using Stats = LevenbergMarquardtStats;
 
-  // check termination criterion on bVector
-  if (op.hessian().maxAbsValBVect() <= _settings.epsBVector) {
-    return LevenbergMarquardtTerminationReason::SuccessAtStart;
+  LevenbergMarquardt();
+  LevenbergMarquardt(const LevenbergMarquardtSettings& settings);
+  virtual ~LevenbergMarquardt();
+
+  LevenbergMarquardtSettings& settings() {
+    return _settings;
+  }
+  const LevenbergMarquardtSettings& settings() const {
+    return _settings;
   }
 
-  // backup solution immediately
-  op.backupSolution();
-  auto oldChi2 = op.hessian().chi2();
-
-  // create the solver
-  _solver.init(op.hessian().H(), op.hessian().b());
-
-  // init mu, V values
-  auto mu = _settings.tau * _solver.maxAbsHDiag();
-  auto curV = _settings.initV;
-
-  iter = 0;
-  while (iter < _settings.maxNumIt) {
-    _stats.addIteration(iter);
-    subiter = 0;
-    bool toRepeat = false;
-    do {
-
-      // compute increment
-      bool solveOk = _solver.computeIncrement(op.hessian().H(), op.hessian().b(), 0, mu);
-
-      // evaluate if the increment is very small and stop in case
-      if (solveOk && iter >= _settings.minNumIt && _solver.incrementVectorSquaredNorm() <= _settings.epsIncSquare) {
-        return LevenbergMarquardtTerminationReason::SuccessSmallIncrement;
-      }
-
-      // evaluate the effects of the iteration performed
-      typename Solver::Type rho = -1;
-      if (solveOk) {
-
-        // apply the increment
-        op.oplus(_solver.incrementVector());
-
-        // compute error and jacobian with this solution, prepare for next iteration
-        op.update(false);
-        _stats.addSubIteration(subiter, op.hessian().chi2());
-
-        // evaluate chi2 change
-        rho = op.computeRhoChi2Change(mu, _solver.incrementVector(), oldChi2);
-
-      } else {
-        _stats.addSubIteration(subiter, -1); // solver error
-      }
-
-      if (solveOk && rho > 0) {
-
-        // check termination criterion on b vector
-        if (iter > _settings.minNumIt && op.hessian().maxAbsValBVect() <= _settings.epsBVector) {
-          return LevenbergMarquardtTerminationReason::SuccessEpsB;
-        }
-
-        // check termination criterion on residuals
-        if (iter > _settings.minNumIt && op.hessian().chi2() < _settings.epsChi2) {
-          return LevenbergMarquardtTerminationReason::SuccessSmallResiduals;
-        }
-
-        // ok, we can go faster!
-        typename Solver::Type fc = (2 * rho - 1);
-        typename Solver::Type alpha = std::min(_settings.maxScaleFactor, 1 - fc * fc * fc);
-        alpha = std::max(_settings.minScaleFactor, alpha);
-        mu = mu * alpha;
-        curV = _settings.initV;
-
-      } else {
-        // no, we have to roll back
-        op.rollbackSolution();
-        mu = mu * curV;
-        curV = curV * _settings.penaltyV;
-      }
-
-      subiter++;
-      if (subiter >= _settings.maxNumSubIt) {
-        return LevenbergMarquardtTerminationReason::MaxSubIterationReached;
-      }
-
-      toRepeat = (rho <= 0 || !solveOk);
-    } while (toRepeat);
-
-    // compute jacobians with current solution
-    op.update(true);
-
-    // and backup for next iteration
-    op.backupSolution();
-    oldChi2 = op.hessian().chi2();
-
-    // next iteration
-    iter++;
+  template <typename RetType = typename Solver::Settings&>
+  inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() {
+    return _solver.settings();
   }
 
-  return LevenbergMarquardtTerminationReason::MaxIterationReached;
-}
+  template <typename RetType = const typename Solver::Settings&>
+  inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() const {
+    return _solver.settings();
+  }
+
+  const Solver& solver() const {
+    return _solver;
+  }
+
+  const LevenbergMarquardtStats stats() const {
+    return _stats;
+  }
+
+  template <class OptimizationProblem>
+  LevenbergMarquardtTerminationReason solve(OptimizationProblem& op);
+
+  int numIterations() const {
+    return iter;
+  }
+  int numSubIterations() const {
+    return subiter;
+  }
+};
 
 } // namespace csNelson

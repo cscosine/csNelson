@@ -7,10 +7,11 @@ cs_add_library(csNelsonSamplesProblem::csNelsonSamplesProblem ALIAS csNelsonSamp
 
 cs_target_sources(csNelsonSamplesProblem
 	PRIVATE_INSTALL
-    Problems.h
+    Problems.hpp
 	PRIVATE
     Problems.cpp
 )
+cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelsonLib::csNelsonLib_csCMakeBaseInclude)
 
 cs_install_target(csNelsonSamplesProblem csNelsonSamplesProblem DEFAULT)
 

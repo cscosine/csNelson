@@ -1,56 +1,144 @@
 #pragma once
-#include "EdgeNary.h"
-#include "EdgeSectionBase.hpp"
+#include <csNelson/Global.hpp>
+
+#include <csNelson/EdgeInterface.hpp>
+#include <csNelson/EdgeSectionBase.hpp>
+
+#include <array>
+#include <vector>
+
+#include <csBlockMatrix/Global.hpp>
+
+#include <Eigen/Core>
 
 namespace csNelson {
 
 template <int N>
-EdgeNaryBase<N>::EdgeNaryBase(int n)
-    : EdgeNaryContainer<N>(n)
-    , _H_uid(n, n) {
-  if (N == csBlockMatrix::Dynamic) {
-    assert(n > 0);
+class EdgeNaryContainer {
+protected:
+  std::array<NodeId, N> _parId;
+
+public:
+  EdgeNaryContainer(int n) {
+    std::fill(_parId.begin(), _parId.end(), -1);
   }
 
-  _H_uid.setConstant(-1);
-}
+  constexpr int numParams() const {
+    return N;
+  }
+};
+template <>
+class EdgeNaryContainer<csBlockMatrix::Dynamic> {
+protected:
+  std::vector<NodeId> _parId;
+
+public:
+  EdgeNaryContainer(int n)
+      : _parId(n, -1) {}
+
+  int numParams() const {
+    return _parId.size();
+  }
+};
 
 template <int N>
-EdgeNaryBase<N>::~EdgeNaryBase() {}
+class EdgeNaryBase : public EdgeInterface, public EdgeNaryContainer<N> {
 
-template <int N>
-void EdgeNaryBase<N>::setParId(int i, NodeId id) {
-  this->_parId[i] = id;
-}
+  Eigen::Matrix<int, N, N> _H_uid; // note, only triag up used.... can we do better storing a linear vector only?
 
-template <int N>
-void EdgeNaryBase<N>::setHUid(int i, int j, int uid) {
-  this->_H_uid(i, j) = uid;
-}
+protected:
+  void setParId(int i, NodeId id);
+  void setHUid(int i, int j, int uid);
 
-//-----------------------------------------
+public:
+  class EdgeUIDSetter final : public EdgeUIDSetterInterface {
+    EdgeNaryBase* _e;
+    int _i, _j;
 
-template <int N>
-void EdgeNaryBase<N>::EdgeUIDSetter::setUID(int uid) {
-  _e->setHUid(_i, _j, uid);
-}
+  public:
+    EdgeUIDSetter(EdgeNaryBase* e, int i, int j)
+        : _e(e)
+        , _i(i)
+        , _j(j) {}
 
-//-----------------------------------------
+    void setUID(int uid) override;
+  };
+
+  // TODO: better if 2 constructor with a enable_if like mechanism....
+  EdgeNaryBase(int size = N);
+  virtual ~EdgeNaryBase();
+
+  NodeId parId(int i) const {
+    return this->_parId[i];
+  }
+
+  int HUid(int i, int j) const {
+    assert(j >= i);
+    return _H_uid(i, j);
+  }
+};
+
+//--------------------------------------------------------------------------------------------------------
 
 template <class Section, int N>
-EdgeNarySectionBase<Section, N>::EdgeNarySectionBase(int size)
-    : EdgeNaryBase<N>(size)
-    , EdgeSectionBase<Section>() {}
+class EdgeNarySectionBase : public EdgeNaryBase<N>, public EdgeSectionBase<Section> {
 
-template <class Section, int N>
-EdgeNarySectionBase<Section, N>::~EdgeNarySectionBase() {}
-//-----------------------------------------
+  template <class Derived, class ParT, int matTypeV, class T, int B, int NB>
+  friend class SingleSection;
+  template <class Derived, class ParUT, class ParVT, int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv, int BVv, int NBUv,
+            int NBVv>
+  friend class DoubleSection;
+
+  class HessianUpdater : public EdgeHessianUpdater {
+    EdgeNarySectionBase* _e;
+    int _i, _j;
+
+  public:
+    HessianUpdater(EdgeNarySectionBase* e, int i, int j)
+        : _e(e)
+        , _i(i)
+        , _j(j) {}
+
+    void updateH(bool transpose) override {
+      _e->updateH(_i, _j, transpose);
+    }
+  };
+
+public:
+  EdgeNarySectionBase(int size = N);
+  virtual ~EdgeNarySectionBase();
+
+  // virtual void update(bool updateHessians) = 0; // defined in base
+
+  virtual void updateH(int i, int j, bool transpose) = 0;
+};
+
+//--------------------------------------------------------------------------------------------------------
 
 template <class Section, int N, class SectionAdapter, class Derived>
-EdgeNarySectionBaseCRPT<Section, N, SectionAdapter, Derived>::EdgeNarySectionBaseCRPT(int size)
-    : EdgeNarySectionBase<Section, N>(size) {}
+class EdgeNarySectionBaseCRPT : public EdgeNarySectionBase<Section, N> {
 
-template <class Section, int N, class SectionAdapter, class Derived>
-EdgeNarySectionBaseCRPT<Section, N, SectionAdapter, Derived>::~EdgeNarySectionBaseCRPT() {}
+public:
+  EdgeNarySectionBaseCRPT(int size = N);
+  virtual ~EdgeNarySectionBaseCRPT();
 
+  inline const typename SectionAdapter::ParameterType& parameter(int i) const {
+    return SectionAdapter::parameter(this->section(), this->parId(i));
+  }
+
+  void updateH(int i, int j, bool transpose) override final {
+    assert(this->HUid(i, j) >= 0);
+    assert(this->parId(i).isVariable());
+    assert(this->parId(j).isVariable());
+
+    typename SectionAdapter::HBlockType bH = SectionAdapter::HBlock(this->section(), this->HUid(i, j));
+    if (i == j) {
+      assert(transpose == false);
+      typename SectionAdapter::BSegmentType bV = SectionAdapter::bSegment(this->section(), this->parId(i).id());
+      static_cast<Derived*>(this)->updateHBlock(i, bH, bV);
+    } else {
+      static_cast<Derived*>(this)->updateHBlock(i, j, bH, transpose);
+    }
+  }
+};
 } // namespace csNelson

@@ -4,7 +4,7 @@
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
 #include <csBlockMatrix/SparsityPattern.hpp>
 
-#include "csNelson/DoubleSectionHessian.hpp"
+#include <csNelson/DoubleSectionHessian_impl.hpp>
 
 static constexpr int secUSizeFix = 6;
 static constexpr int secVSizeFix = 3;

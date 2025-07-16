@@ -2,10 +2,10 @@
 
 #include <csBlockMatrix/Global.hpp>
 
-#include "OrderingTraits.h"
+#include <csNelson/OrderingTraits.hpp>
 
-#include "SolverCholeskyDense.h"
-#include "SolverCholeskySparse.h"
+#include <csNelson/SolverCholeskyDense.hpp>
+#include <csNelson/SolverCholeskySparse.hpp>
 
 namespace csNelson {
 

@@ -1,112 +1,132 @@
 #pragma once
-#include "SolverDiagonalBlocksInverseWWtMultSchur.h"
+#include <csNelson/Global.hpp>
 
-#include <csBlockMatrix/VectorBlock_impl.hpp>
+#include <csNelson/MatrixDenseWrapper.hpp>
+#include <csNelson/MatrixSparseWrapper.hpp>
 
-#include "MatrixDiagInv.hpp"
-#include "MatrixWVinvMultiplier.hpp"
-#include "MatrixWWtMultiplier.hpp"
-#include "MatrixWtXMultiplier.hpp"
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
+#include <csBlockMatrix/VectorBlock.hpp>
+
+#include <csNelson/DoubleSectionHessianMatrices.hpp>
+
+#include <csNelson/SingleSectionHessian.hpp>
+#include <csNelson/SolverCholeskyDense.hpp>
+#include <csNelson/SolverCholeskySparse.hpp>
+
+#include <csNelson/MatrixWrapperTraits.hpp>
+#include <csNelson/SolverTraitsBase.hpp>
+
+#include <Eigen/Dense>
+
+#include <csNelson/ParallelExecHelper.hpp>
+
+#include <csNelson/MatrixDiagInv.hpp>
+#include <csNelson/MatrixWVinvMultiplier.hpp>
+#include <csNelson/MatrixWWtMultiplier.hpp>
+#include <csNelson/MatrixWtXMultiplier.hpp>
+
+#include <chrono>
 
 namespace csNelson {
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
-                                        choleskyOrderingS>::SolverDiagonalBlocksInverseWWtMultSchur()
-    : _settings(_Vinv.settings(), _WVinv.settings(), _wwtMult.settings(), _WtX.settings())
-    , _uv_maxAbsHDiag(-1) {}
+struct SolverDiagonalBlocksInverseWWtMultSchurIterationTimeStat {
+  std::chrono::steady_clock::time_point t0_startIteration;
+  std::chrono::steady_clock::time_point t1_VInvComputed;
+  std::chrono::steady_clock::time_point t2_WVinvComputed;
+  std::chrono::steady_clock::time_point t3_bSComputed;
+  std::chrono::steady_clock::time_point t4_SComputed;
+  std::chrono::steady_clock::time_point t5_xUSolved;
+  std::chrono::steady_clock::time_point t6_bVtildeComputed;
+  std::chrono::steady_clock::time_point t7_bVComputed;
+  std::string toString(const std::string& linePrefix = "") const;
+};
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-void SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType, choleskyOrderingS>::init(
-    DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b) {
-  _timeStats.startInit = std::chrono::steady_clock::now();
-
-  // prepare vectors
-  _incVector.bU().resize(b.bU().segmentDescriptionCSPtr());
-  _bS.resize(b.bU().segmentDescriptionCSPtr());
-
-  _incVector.bV().resize(b.bV().segmentDescriptionCSPtr());
-  _bVtilde.resize(b.bV().segmentDescriptionCSPtr());
-
-  // prepare V^-1 management
-  _Vinv.init(input.V());
-
-  // prepare W*V^-1 management
-  _WVinv.prepare(input.W());
-
-  // sparsity pattern in a sparse matrix
-  auto sp = input.W().sparsityPattern().toSparseMatrix();
-
-  // prepare W*V^-1*W' management
-  _wwtMult.prepare(input.U(), input.W(), &sp);
-
-  // prepare the solver
-  _solverS.init(_wwtMult.result(), _bS);
-
-  // prepare W'*xu
-  _WtX.prepare(input.W(), &sp);
-
-  // temporary, not extremely smart....
-  _uv_maxAbsHDiag = Eigen::NumTraits<T>::lowest();
-  for (int c = 0; c < input.V().numBlocksCol(); c++) {
-    c = std::max(_uv_maxAbsHDiag, input.V().blockByUID(c).diagonal().cwiseAbs().maxCoeff());
+struct SolverDiagonalBlocksInverseWWtMultSchurTimeStats {
+  std::chrono::steady_clock::time_point startInit;
+  std::chrono::steady_clock::time_point endInit;
+  std::vector<SolverDiagonalBlocksInverseWWtMultSchurIterationTimeStat> iterations;
+  SolverDiagonalBlocksInverseWWtMultSchurIterationTimeStat& lastIteration() {
+    return iterations.back();
   }
-  for (int c = 0; c < input.U().numBlocksCol(); c++) {
-    _uv_maxAbsHDiag = std::max(_uv_maxAbsHDiag, input.U().block(c, c).diagonal().cwiseAbs().maxCoeff());
+  void addIteration() {
+    iterations.push_back(SolverDiagonalBlocksInverseWWtMultSchurIterationTimeStat());
   }
+  std::string toString(const std::string& linePrefix = "") const;
+};
 
-  _timeStats.endInit = std::chrono::steady_clock::now();
-}
+struct SolverDiagonalBlocksInverseWWtMultSchurIterationSettings {
+  MatrixDiagInvSettings& Vinv;
+  MatrixWVinvMultiplierSettings& WVinv;
+  MatrixWWtMultiplierSettings& WVinvWt;
+  MatrixWtXMultiplierSettings& WtX;
+
+  SolverDiagonalBlocksInverseWWtMultSchurIterationSettings(MatrixDiagInvSettings& Vinv, MatrixWVinvMultiplierSettings& WVinv,
+                                                           MatrixWWtMultiplierSettings& WVinvWt, MatrixWtXMultiplierSettings& WtX)
+      : Vinv(Vinv)
+      , WVinv(WVinv)
+      , WVinvWt(WVinvWt)
+      , WtX(WtX) {}
+};
 
 template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-T SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType, choleskyOrderingS>::maxAbsHDiag()
-    const {
-  return _uv_maxAbsHDiag;
-}
+class SolverDiagonalBlocksInverseWWtMultSchur {
+public:
+  using DoubleSectionHessianMatricesT = DoubleSectionHessianMatrices<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV>;
+  using DoubleSectionHessianVectorsT = DoubleSectionHessianVectors<T, BU, BV, NBU, NBV>;
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-bool SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
-                                             choleskyOrderingS>::computeIncrement(DoubleSectionHessianMatricesT& input,
-                                                                                  const DoubleSectionHessianVectorsT& b, T relLambda,
-                                                                                  T absLambda) {
-  _timeStats.addIteration();
+  using Type = T;
 
-  bool ok = true;
+  static constexpr bool hasSettings = true;
+  using Settings = SolverDiagonalBlocksInverseWWtMultSchurIterationSettings;
 
-  // V^-1
-  _timeStats.lastIteration().t0_startIteration = std::chrono::steady_clock::now();
-  _Vinv.compute(input.V(), relLambda, absLambda);
-  _timeStats.lastIteration().t1_VInvComputed = std::chrono::steady_clock::now();
+private:
+  DoubleSectionHessianVectorsT _incVector;
 
-  // W * V^-1
-  _WVinv.multiply(input.W(), _Vinv.Vinv());
-  _timeStats.lastIteration().t2_WVinvComputed = std::chrono::steady_clock::now();
+  typename DoubleSectionHessianVectorsT::VecTypeU _bS;
+  typename DoubleSectionHessianVectorsT::VecTypeV _bVtilde;
 
-  // bs = bU - W*V^-1*bv
-  _bS.mat() = b.bU().mat();
-  _WVinv.rightMultVectorSub(b.bV(), _bS);
-  _timeStats.lastIteration().t3_bSComputed = std::chrono::steady_clock::now();
+  static constexpr int matSType =
+      MatrixWrapperTraits<SType>::template Wrapper<matTypeU, T, csBlockMatrix::ColMajor, BU, BU, NBU, NBU>::matOutputType;
 
-  // S = W * V^-1 * W'
-  _wwtMult.multiply(input.U(), _WVinv.result(), input.W());
-  _timeStats.lastIteration().t4_SComputed = std::chrono::steady_clock::now();
+  MatrixDiagInv<matTypeV, double, BV, NBV, matTypeV> _Vinv;
+  MatrixWVinvMultiplier<matTypeW, matTypeV, T, BU, BV, NBU, NBV> _WVinv;
+  MatrixWWtMultiplier<matSType, T, BU, NBU> _wwtMult;
+  MatrixWtXMultiplier<matTypeW, T, BU, BV, NBU, NBV> _WtX;
 
-  ok = _solverS.computeIncrement(_wwtMult.result(), _bS, relLambda, absLambda, _incVector.bU());
-  _timeStats.lastIteration().t5_xUSolved = std::chrono::steady_clock::now();
+  typename SolverTraits<SType>::template SolverBase<SingleSectionHessianTraits<matSType, T, BU, NBU>, choleskyOrderingS> _solverS;
 
-  _bVtilde.mat() = -b.bV().mat();
-  _WtX.rightMultVectorSub(input.W(), _incVector.bU(), _bVtilde);
-  _timeStats.lastIteration().t6_bVtildeComputed = std::chrono::steady_clock::now();
+  T _uv_maxAbsHDiag;
 
-  _Vinv.rightMultVector(_bVtilde, _incVector.bV());
-  _timeStats.lastIteration().t7_bVComputed = std::chrono::steady_clock::now();
+  Settings _settings;
+  SolverDiagonalBlocksInverseWWtMultSchurTimeStats _timeStats;
 
-  if (!ok) {
-    // defense
-    _incVector.setZero();
+public:
+  SolverDiagonalBlocksInverseWWtMultSchur();
+
+  Settings& settings() {
+    return _settings;
+  }
+  const Settings& settings() const {
+    return _settings;
   }
 
-  return ok;
-}
+  const SolverDiagonalBlocksInverseWWtMultSchurTimeStats& timingStats() const {
+    return _timeStats;
+  }
+
+  void init(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b);
+
+  T maxAbsHDiag() const;
+
+  bool computeIncrement(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b, T relLambda, T absLambda);
+
+  const DoubleSectionHessianVectorsT& incrementVector() const {
+    return _incVector;
+  }
+
+  T incrementVectorSquaredNorm() const {
+    return _incVector.bU().mat().squaredNorm() + _incVector.bV().mat().squaredNorm();
+  }
+};
 
 } // namespace csNelson

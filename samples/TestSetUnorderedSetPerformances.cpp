@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "Problems.h"
+#include <samples/Problems.hpp>
 
 #include <chrono>
 #include <fstream>

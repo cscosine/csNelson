@@ -1,4 +1,4 @@
-#include "BaseSection.h"
+#include <csNelson/BaseSection.hpp>
 
 namespace csNelson {
 

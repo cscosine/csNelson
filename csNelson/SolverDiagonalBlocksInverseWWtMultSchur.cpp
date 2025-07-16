@@ -1,5 +1,5 @@
-#include "SolverDiagonalBlocksInverseWWtMultSchur.h"
-#include "SolverDiagonalBlocksInverseWWtMultSchur.hpp"
+#include <csNelson/SolverDiagonalBlocksInverseWWtMultSchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseWWtMultSchur_impl.hpp>
 
 #include <iomanip>
 #include <sstream>

@@ -1,123 +1,165 @@
 #pragma once
-#include "GaussNewton.h"
+#include <csNelson/Global.hpp>
 
-#include "SolverCholeskyDense.hpp"
-#include "SolverCholeskySchur.hpp"
-#include "SolverCholeskySparse.hpp"
-#include "SolverDiagonalBlocksInverseSchur.hpp"
-#include "SolverDiagonalBlocksInverseWWtMultSchur.hpp"
+#include <csBlockMatrix/Global.hpp>
+#include <csNelson/SolverCholeskyDense.hpp>
+#include <csNelson/SolverCholeskySchur.hpp>
+#include <csNelson/SolverCholeskySparse.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseSchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseWWtMultSchur.hpp>
+
+#include <csNelson/SolverTraits.hpp>
+
+#include <string>
+#include <vector>
 
 namespace csNelson {
 
-template <class Solver>
-GaussNewton<Solver>::GaussNewton()
-    : iter(-1) {}
+struct GaussNewtonSettings {
+  int maxNumIt;
+  int minNumIt;
+  double epsBVector;
+  double epsIncSquare;
+  double epsChi2;
+  double absLambda;
+  double relLambda;
 
-template <class Solver>
-GaussNewton<Solver>::GaussNewton(const GaussNewtonSettings& settings)
-    : _settings(settings)
-    , iter(-1) {}
+  GaussNewtonSettings();
+  virtual ~GaussNewtonSettings();
+};
 
-template <class Solver>
-GaussNewton<Solver>::~GaussNewton() {}
+//------------------------------------------------------------------------------------------------------
 
-template <class Solver>
-template <class OptimizationProblem>
-GaussNewtonTerminationReason GaussNewton<Solver>::solve(OptimizationProblem& op) {
+enum class GaussNewtonTerminationReason {
+  SuccessAtStart,
+  SuccessSmallIncrement,
+  SuccessEpsB,
+  SuccessSmallResiduals,
+  SolverFailure,
+  MaxIterationReached
+};
 
-  _stats.reserve(_settings.maxNumIt);
-  _timingStats.reserve(_settings.maxNumIt);
+class GaussNewtonUtils {
+  static const std::vector<std::string> _terminationReasonStrings;
 
-  // compute initial error
-  {
-    auto t0 = std::chrono::steady_clock::now();
-    op.update(true);
-    auto t1 = std::chrono::steady_clock::now();
-    _stats.addIteration(iter, op.hessian().chi2());
-    _timingStats.setFirstEvalTime(std::chrono::duration<double>(t1 - t0));
-  }
-  // check termination criterion on bVector
-  if (op.hessian().maxAbsValBVect() <= _settings.epsBVector) {
-    return GaussNewtonTerminationReason::SuccessAtStart;
-  }
+public:
+  static bool success(GaussNewtonTerminationReason lm);
+  static std::string toString(GaussNewtonTerminationReason lm);
+};
 
-  // create the solver
-  {
-    auto t0 = std::chrono::steady_clock::now();
-    _solver.init(op.hessian().H(), op.hessian().b());
-    auto t1 = std::chrono::steady_clock::now();
-    _timingStats.setSolverInitTime(std::chrono::duration<double>(t1 - t0));
-  }
+//------------------------------------------------------------------------------------------------------
 
-  iter = 0;
-  auto tinit = std::chrono::steady_clock::now();
-  while (iter < _settings.maxNumIt) {
+class GaussNewtownStats {
+public:
+  struct Stats {
+    int it;
+    double chi2;
+  };
 
-    TimingStats::IterationTime timeStat;
+private:
+  std::vector<Stats> _stats;
 
-    bool solveOk = false;
-    {
-      auto t0 = std::chrono::steady_clock::now();
-      solveOk = _solver.computeIncrement(op.hessian().H(), op.hessian().b(), _settings.relLambda, _settings.absLambda);
-      auto t1 = std::chrono::steady_clock::now();
-      timeStat.computeIncrementTime = std::chrono::duration<double>(t1 - t0);
-    }
-    // check solution validity
-    if (!solveOk) {
-      auto tend = std::chrono::steady_clock::now();
-      timeStat.overallTime = tend - tinit;
-      _timingStats.addIteration(timeStat);
+public:
+  GaussNewtownStats();
+  virtual ~GaussNewtownStats();
 
-      return GaussNewtonTerminationReason::SolverFailure;
-    }
+  void reserve(int n);
 
-    // evaluate if the increment is very small and stop in case
-    if (iter >= _settings.minNumIt && _solver.incrementVectorSquaredNorm() <= _settings.epsIncSquare) {
-      auto tend = std::chrono::steady_clock::now();
-      timeStat.overallTime = tend - tinit;
-      _timingStats.addIteration(timeStat);
+  void addIteration(int it, double chi2);
+  std::string toString() const;
+};
 
-      return GaussNewtonTerminationReason::SuccessSmallIncrement;
-    }
+class GaussNewtownTimingStats {
+public:
+  struct IterationTime {
+    std::chrono::duration<double> evalTime;
+    std::chrono::duration<double> applyIncrementTime;
+    std::chrono::duration<double> computeIncrementTime;
+    std::chrono::duration<double> overallTime;
+    IterationTime();
+    std::string toString(const std::string& linePrefix = "") const;
+  };
 
-    // apply the increment
-    {
-      auto t0 = std::chrono::steady_clock::now();
-      op.oplus(_solver.incrementVector());
-      auto t1 = std::chrono::steady_clock::now();
-      timeStat.applyIncrementTime = std::chrono::duration<double>(t1 - t0);
-    }
+private:
+  std::vector<IterationTime> _stats;
+  std::chrono::duration<double> _firstEvalTime;
+  std::chrono::duration<double> _solverInitTime;
 
-    // compute error and jacobian with this solution, prepare for next iteration
-    {
-      auto t0 = std::chrono::steady_clock::now();
-      op.update(true);
-      auto t1 = std::chrono::steady_clock::now();
-      timeStat.evalTime = std::chrono::duration<double>(t1 - t0);
-    }
-    _stats.addIteration(iter, op.hessian().chi2());
+public:
+  GaussNewtownTimingStats();
+  virtual ~GaussNewtownTimingStats();
 
-    auto tend = std::chrono::steady_clock::now();
-    timeStat.overallTime = tend - tinit;
-    _timingStats.addIteration(timeStat);
-    tinit = tend;
+  void reserve(int n);
 
-    // check termination criterion on b vector
-    if (iter > _settings.minNumIt && op.hessian().maxAbsValBVect() <= _settings.epsBVector) {
-      return GaussNewtonTerminationReason::SuccessEpsB;
-    }
-
-    // check termination criterion on residuals
-    if (iter > _settings.minNumIt && op.hessian().chi2() < _settings.epsChi2) {
-      return GaussNewtonTerminationReason::SuccessSmallResiduals;
-    }
-
-    // todo: check chi2 relative small change for success and other termination criterion
-
-    iter++;
+  void setFirstEvalTime(const std::chrono::duration<double>& d) {
+    _firstEvalTime = d;
+  };
+  void setSolverInitTime(const std::chrono::duration<double>& d) {
+    _solverInitTime = d;
   }
 
-  return GaussNewtonTerminationReason::MaxIterationReached;
-}
+  void addIteration(const IterationTime& it);
+
+  std::string toString(const std::string& linePrefix = "") const;
+};
+
+//------------------------------------------------------------------------------------------------------
+
+template <class Solver>
+class GaussNewton {
+
+  Solver _solver;
+
+  GaussNewtonSettings _settings;
+  int iter;
+
+  GaussNewtownStats _stats;
+  GaussNewtownTimingStats _timingStats;
+
+public:
+  using Utils = GaussNewtonUtils;
+  using Settings = GaussNewtonSettings;
+  using Stats = GaussNewtownStats;
+  using TimingStats = GaussNewtownTimingStats;
+
+  GaussNewton();
+  GaussNewton(const GaussNewtonSettings& settings);
+  virtual ~GaussNewton();
+
+  GaussNewtonSettings& settings() {
+    return _settings;
+  }
+  const GaussNewtonSettings& settings() const {
+    return _settings;
+  }
+
+  template <typename RetType = typename Solver::Settings&>
+  inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() {
+    return _solver.settings();
+  }
+
+  template <typename RetType = const typename Solver::Settings&>
+  inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() const {
+    return _solver.settings();
+  }
+
+  const GaussNewtownStats stats() const {
+    return _stats;
+  }
+  const GaussNewtownTimingStats timingStats() const {
+    return _timingStats;
+  }
+
+  const Solver& solver() const {
+    return _solver;
+  }
+
+  template <class OptimizationProblem>
+  GaussNewtonTerminationReason solve(OptimizationProblem& op);
+
+  int numIterations() const {
+    return iter;
+  }
+};
 
 } // namespace csNelson

@@ -1,160 +1,282 @@
 #pragma once
-#include "MatrixSparseWrapper.h"
+#include <csNelson/Global.hpp>
+
+#include <csBlockMatrix/MatrixBlockTypeTraits.hpp>
+#include <csBlockMatrix/MatrixTypeTraits.hpp>
 
 namespace csNelson {
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
+template <int matType, class T, int Ordering, int BR, int BC, int NBR = csBlockMatrix::Dynamic, int NBC = csBlockMatrix::Dynamic>
+class SparseWrapper {};
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
-  this->_matrix = matrix;
-  this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
-  this->refresh();
-}
+class SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+  using MatCopyType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR,
+                                                                            NBC>::MatrixType;
+  using MatOutputType = typename MatCopyType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
 
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::refresh() {
-  assert(this->_matrix != nullptr);
-  for (int cb = 0; cb < this->_matrix->outerSize(); cb++) {
-    for (auto it = this->_matrix->begin(cb); it() != it.end(); it++) {
-      // this->_matCopy.block(it.row(), it.col()) = it.block();
-      this->_matCopy.blockByUID(it.blockUID()) = it.block();
-    }
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the coeff sparse block, used as copy, internally contains a sparse matrix
+  MatCopyType _matCopy;
+
+public:
+  SparseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~SparseWrapper();
+
+  void set(MatType* matrix);
+
+  void refresh();
+
+  typename MatCopyType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
   }
-}
-
-//---------------------------------------------------------------------------------------------------
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-SparseWrapper<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-SparseWrapper<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
-
-//---------------------------------------------------------------------------------------------------
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
-  this->_matrix = matrix;
-  this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
-  this->refresh();
-}
-
-template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::refresh() {
-  assert(this->_matrix != nullptr);
-  for (int cb = 0; cb < this->_matrix->outerSize(); cb++) {
-    for (auto it = this->_matrix->begin(cb); it() != it.end(); it++) {
-      // this->_matCopy.block(it.row(), it.col()) = it.block();
-      this->_matCopy.blockByUID(it.blockUID()) = it.block();
-    }
+  const typename MatCopyType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
   }
-}
+
+  MatCopyType& matBlocks() {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+  const MatCopyType& matBlocks() const {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+};
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
+class SparseWrapper<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR,
+                                                                        NBC>::MatrixType;
+  using MatOutputType = typename MatType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+public:
+  SparseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~SparseWrapper();
+
+  void set(MatType* matrix) {
+    this->_matrix = matrix;
+    this->refresh();
+  }
+
+  void refresh() {
+    // nothig to do
+  }
+
+  typename MatType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+  typename MatType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+
+  MatType& matBlocks() {
+    assert(_matrix != nullptr);
+    return *_matrix;
+  }
+  const MatType& matBlocks() const {
+    assert(_matrix != nullptr);
+    return *_matrix;
+  }
+};
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
-  this->_matrix = matrix;
-  this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
-  this->refresh();
-}
+class SparseWrapper<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::SparseCoeffBlockDiagonal, T, Ordering, BR, BC,
+                                                                        NBR, NBC>::MatrixType;
+  using MatOutputType = typename MatType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+public:
+  SparseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~SparseWrapper();
+
+  void set(MatType* matrix) {
+    this->_matrix = matrix;
+    this->refresh();
+  }
+
+  void refresh() {
+    // nothig to do
+  }
+
+  typename MatType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+  typename MatType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matrix->mat();
+  }
+
+  MatType& matBlocks() {
+    assert(_matrix != nullptr);
+    return *_matrix;
+  }
+  const MatType& matBlocks() const {
+    assert(_matrix != nullptr);
+    return *_matrix;
+  }
+};
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::refresh() {
-  assert(this->_matrix != nullptr);
-  for (int cb = 0; cb < this->_matrix->outerSize(); cb++) {
-    for (auto it = this->_matrix->begin(cb); it() != it.end(); it++) {
-      // this->_matCopy.block(it.row(), it.col()) = it.block();
-      this->_matCopy.blockByUID(it.blockUID()) = it.block();
-    }
+class SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+
+  using MatCopyType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR,
+                                                                            NBC>::MatrixType;
+  using MatOutputType = typename MatCopyType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the coeff sparse block, used as copy, internally contains a sparse matrix
+  MatCopyType _matCopy;
+
+public:
+  SparseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~SparseWrapper();
+
+  void set(MatType* matrix);
+
+  void refresh();
+
+  typename MatCopyType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
   }
-}
-
-//---------------------------------------------------------------------------------------------------
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-SparseSquareWrapper<matType, T, Ordering, BR, NBR>::SparseSquareWrapper()
-    : SparseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>()
-    , _diagonalCoeffIndexesInitialized(false) {
-  // if it is fixed size
-  _diagonalCoeffIndexes.setConstant(-1);
-}
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-SparseSquareWrapper<matType, T, Ordering, BR, NBR>::~SparseSquareWrapper() {}
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::initDiagonalCoefficients() const {
-  if (!_diagonalCoeffIndexesInitialized) {
-    _diagonalCoeffIndexesInitialized = true;
-    // store indexes
-    assert(this->mat().rows() == this->mat().cols());
-    _diagonalCoeffIndexes.resize(this->mat().rows());
-    int c = 0;
-    // detect diagonal blocks
-    for (int o = 0; o < this->matBlocks().sparsityPattern().outerSize(); o++) {
-      const auto& innerSet = this->matBlocks().sparsityPattern().inner(o);
-      int inCount = innerSet.size() - 1;
-      for (auto rit = innerSet.crbegin(); rit != innerSet.crend(); rit++) {
-        int in = *rit;
-        int i = this->matBlocks().row(o, in);
-        int j = this->matBlocks().col(o, in);
-        if (i == j) {
-          assert(this->matBlocks().rowBlockSize(i) == this->matBlocks().colBlockSize(j));
-          int offset = this->matBlocks().blockCoeffStart(o, inCount);
-          int ostride = this->matBlocks().blockCoeffStride(o);
-          for (int k = 0; k < this->matBlocks().rowBlockSize(i); k++) {
-            _diagonalCoeffIndexes[c++] = offset + (ostride + 1) * k;
-          }
-          break;
-        }
-        inCount--;
-      }
-    }
-    assert(c == _diagonalCoeffIndexes.size());
+  const typename MatCopyType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
   }
-}
 
-template <int matType, class T, int Ordering, int BR, int NBR>
-typename SparseSquareWrapper<matType, T, Ordering, BR, NBR>::DiagType
-SparseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonal() const {
-  initDiagonalCoefficients(); // lazy
-  SparseSquareWrapper<matType, T, Ordering, BR, NBR>::DiagType ret(_diagonalCoeffIndexes.size());
-  this->diagonalCopy(ret);
-  return ret;
-}
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-T SparseSquareWrapper<matType, T, Ordering, BR, NBR>::maxAbsDiag() const {
-  return diagonal().cwiseAbs().maxCoeff();
-}
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-template <class Derived>
-void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived>& dest) const {
-  initDiagonalCoefficients(); // lazy
-  assert(dest.size() == _diagonalCoeffIndexes.size());
-  // in Eigen 3.4 this will be easier with slices!!
-  for (int i = 0; i < _diagonalCoeffIndexes.size(); i++) {
-    dest(i) = this->mat().coeffs()(_diagonalCoeffIndexes(i));
+  MatCopyType& matBlocks() {
+    assert(_matrix != nullptr);
+    return _matCopy;
   }
-}
-
-template <int matType, class T, int Ordering, int BR, int NBR>
-template <class Derived>
-void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived>& values) {
-  initDiagonalCoefficients(); // lazy
-  // in Eigen 3.4 this will be easier with slices!!
-  assert(values.size() == _diagonalCoeffIndexes.size());
-  for (int i = 0; i < _diagonalCoeffIndexes.size(); i++) {
-    this->mat().coeffs()(_diagonalCoeffIndexes(i)) = values(i);
+  const MatCopyType& matBlocks() const {
+    assert(_matrix != nullptr);
+    return _matCopy;
   }
-}
+};
+
+template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
+class SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC> {
+public:
+  using MatType =
+      typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::MatrixType;
+
+  using MatCopyType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<csBlockMatrix::BlockCoeffSparse, T, Ordering, BR, BC, NBR,
+                                                                            NBC>::MatrixType;
+  using MatOutputType = typename MatCopyType::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
+
+private:
+  // the original matrix
+  MatType* _matrix;
+
+  // the coeff sparse block, used as copy, internally contains a sparse matrix
+  MatCopyType _matCopy;
+
+public:
+  SparseWrapper()
+      : _matrix(nullptr) {}
+
+  virtual ~SparseWrapper();
+
+  void set(MatType* matrix);
+
+  void refresh();
+
+  typename MatCopyType::StorageType& mat() {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+  const typename MatCopyType::StorageType& mat() const {
+    assert(_matrix != nullptr);
+    return _matCopy.mat();
+  }
+
+  MatCopyType& matBlocks() {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+  const MatCopyType& matBlocks() const {
+    assert(_matrix != nullptr);
+    return _matCopy;
+  }
+};
+
+//------------------------------------------------------------------------------------------------------------------
+
+template <int matType, class T, int Ordering, int BR, int NBR = csBlockMatrix::Dynamic>
+class SparseSquareWrapper : public SparseWrapper<matType, T, Ordering, BR, BR, NBR, NBR> {
+public:
+  using MatType = typename SparseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>::MatType;
+  using DiagType = typename csBlockMatrix::VectorBlockTraits<T, BR, NBR>::StorageType;
+  static constexpr int matOutputType = csBlockMatrix::BlockCoeffSparse;
+
+private:
+  mutable typename csBlockMatrix::VectorBlockTraits<int, BR, NBR>::StorageType _diagonalCoeffIndexes;
+  mutable bool _diagonalCoeffIndexesInitialized;
+
+  // lasy search for coefficients
+  void initDiagonalCoefficients() const;
+
+public:
+  SparseSquareWrapper();
+  virtual ~SparseSquareWrapper();
+
+  bool diagonalCoeffIndexesInitialized() const {
+    return _diagonalCoeffIndexesInitialized;
+  }
+
+  typename csBlockMatrix::VectorBlockTraits<int, BR, NBR>::StorageType diagonalCoeffIndexes() const {
+    return _diagonalCoeffIndexes;
+  }
+
+  DiagType diagonal() const;
+  T maxAbsDiag() const;
+
+  template <class Derived>
+  void diagonalCopy(Eigen::DenseBase<Derived>& dest) const;
+
+  template <class Derived>
+  void setDiagonal(const Eigen::DenseBase<Derived>& values);
+};
 
 } // namespace csNelson

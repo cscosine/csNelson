@@ -1,8 +1,8 @@
 #pragma once
-#include "testDoubleSectionSchurCommon.h"
+#include <csNelson/testDoubleSectionSchurCommon.hpp>
 
-#include "csNelson/GaussNewton.hpp"
-#include "csNelson/LevenbergMarquardt.hpp"
+#include <csNelson/GaussNewton_impl.hpp>
+#include <csNelson/LevenbergMarquardt_impl.hpp>
 
 template <class TestType, template <typename> class Solver>
 void testFunction() {

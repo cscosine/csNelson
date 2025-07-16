@@ -2,10 +2,10 @@
 
 #include <csBlockMatrix/Global.hpp>
 
-#include "SolverCholeskySchur.h"
-#include "SolverDiagonalBlocksInverseSchur.h"
-#include "SolverDiagonalBlocksInverseWWtMultSchur.h"
-#include "SolverTraitsBase.h"
+#include <csNelson/SolverCholeskySchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseSchur.hpp>
+#include <csNelson/SolverDiagonalBlocksInverseWWtMultSchur.hpp>
+#include <csNelson/SolverTraitsBase.hpp>
 
 namespace csNelson {
 

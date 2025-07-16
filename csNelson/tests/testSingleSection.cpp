@@ -4,10 +4,10 @@
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
 #include <csBlockMatrix/SparsityPattern.hpp>
 
-#include "csNelson/EdgeBinary.hpp"
-#include "csNelson/EdgeUnary.hpp"
-#include "csNelson/SingleSection.hpp"
-#include "csNelson/SingleSectionHessian.hpp"
+#include <csNelson/EdgeBinary_impl.hpp>
+#include <csNelson/EdgeUnary_impl.hpp>
+#include <csNelson/SingleSectionHessian_impl.hpp>
+#include <csNelson/SingleSection_impl.hpp>
 
 #include <array>
 #include <iostream>

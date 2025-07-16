@@ -1,5 +1,5 @@
-#include "EdgeUnary.h"
-#include "EdgeUnary.hpp"
+#include <csNelson/EdgeUnary.hpp>
+#include <csNelson/EdgeUnary_impl.hpp>
 
 namespace csNelson {
 

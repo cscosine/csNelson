@@ -1,13 +1,13 @@
 #pragma once
-#include "Global.h"
+#include <csNelson/Global.hpp>
 
-#include "ParallelExecHelper.h"
+#include <csNelson/ParallelExecHelper.hpp>
 
 #include <forward_list>
 #include <memory>
 #include <vector>
 
-#include "EdgeInterface.h"
+#include <csNelson/EdgeInterface.hpp>
 
 namespace csNelson {
 
