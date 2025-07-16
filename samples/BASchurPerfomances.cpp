@@ -13,8 +13,8 @@
 #include "csNelson/GaussNewton.hpp"
 #include "csNelson/LevenbergMarquardt.hpp"
 
-#include "csCamera/Camera.hpp"
-#include "csCamera/Utils.hpp"
+#include <csCamera/Camera_impl.hpp>
+#include <csCamera/Utils_impl.hpp>
 
 #include "csLie/SE3_impl.hpp"
 #include "csLie/Utils_impl.hpp"
