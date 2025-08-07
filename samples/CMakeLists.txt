@@ -11,7 +11,7 @@ cs_target_sources(csNelsonSamplesProblem
 	PRIVATE
     Problems.cpp
 )
-cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelsonLib::csNelsonLib_csCMakeBaseInclude)
+cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelsonSol::csNelsonSol_csCMakeBaseInclude)
 
 cs_install_target(csNelsonSamplesProblem csNelsonSamplesProblem DEFAULT)
 

@@ -102,7 +102,7 @@ cs_target_link_libraries(csNelson
       csBlockMatrix::csBlockMatrix
 		csCore::eigenUtils
 		csNelson::csNelsonAssert
-		csNelsonLib::csNelsonLib_csCMakeBaseInclude
+		csNelsonSol::csNelsonSol_csCMakeBaseInclude
 )
 
 # TODO(sc) re-enable tests

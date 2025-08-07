@@ -1,10 +1,10 @@
 cmake_minimum_required(VERSION 3.31)
-project(csNelsonLib VERSION 1.0.0 LANGUAGES CXX)
+project(csNelsonSol VERSION 1.0.0 LANGUAGES CXX)
 
 # add the csCMake system
 include(csCMake)
 
-cs_initialize_project(csNelsonLib
+cs_initialize_project(csNelsonSol
     # add the default configurations supported by this project
     DEFAULT_CONFIG Debug
     DEFAULT_CONFIG Release
