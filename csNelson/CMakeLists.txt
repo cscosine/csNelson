@@ -24,10 +24,10 @@ cs_add_library(csNelson::csNelson ALIAS csNelson)
 cs_find_package(csNelson PUBLIC Eigen3 REQUIRED CONFIG)
 cs_find_package(csNelson PUBLIC csCore COMPONENTS core eigenUtils REQUIRED CONFIG)
 
-message(STATUS "Looking for OpenMP. If this fail, for clang try `sudo apt install libomp-dev`")
-cs_find_package(csNelson PUBLIC OpenMP REQUIRED)
-
 cs_find_package(csNelson PUBLIC csBlockMatrix COMPONENTS csBlockMatrix REQUIRED)
+
+# add openmp support, this will both find the right packages and add link libraries
+csUseOpenMPOnTarget(csNelson PUBLIC)
 
 cs_target_sources(csNelson
 	PRIVATE_INSTALL
