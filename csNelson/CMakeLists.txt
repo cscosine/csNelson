@@ -27,7 +27,7 @@ cs_find_package(csNelson PUBLIC csCore COMPONENTS core eigenUtils REQUIRED CONFI
 cs_find_package(csNelson PUBLIC csBlockMatrix COMPONENTS csBlockMatrix REQUIRED)
 
 # add openmp support, this will both find the right packages and add link libraries
-csUseOpenMPOnTarget(csNelson PUBLIC)
+cs_target_use_openmp(csNelson PUBLIC)
 
 cs_target_sources(csNelson
 	PRIVATE_INSTALL
@@ -102,13 +102,10 @@ cs_target_link_libraries(csNelson
       csBlockMatrix::csBlockMatrix
 		csCore::eigenUtils
 		csNelson::csNelsonAssert
-		csNelsonSol::csNelsonSol_csCMakeBaseInclude
-        csNelsonSol::csNelsonSol_csCMakeCompileOptionsDefault
+		csNelson::cscmake_base_include
 )
 
 # TODO(sc) re-enable tests
 # add_subdirectory(tests)
 
-cs_install_target(csNelson csNelson DEFAULT)
-
-cs_finalize_target(csNelson)
+cs_install_target(csNelson COMPONENT csNelson DEFAULT)

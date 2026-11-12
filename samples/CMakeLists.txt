@@ -11,11 +11,9 @@ cs_target_sources(csNelsonSamplesProblem
 	PRIVATE
     Problems.cpp
 )
-cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelsonSol::csNelsonSol_csCMakeBaseInclude)
+cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelson::cscmake_base_include)
 
-cs_install_target(csNelsonSamplesProblem csNelsonSamplesProblem DEFAULT)
-
-cs_finalize_target(csNelsonSamplesProblem)
+cs_install_target(csNelsonSamplesProblem COMPONENT csNelsonSamplesProblem DEFAULT)
 
 #---------------------------------------------------------------
 # prepare a set of samples dependent on the above library
@@ -32,8 +30,7 @@ foreach(s ${SAMPLES_LIST})
 	cs_add_executable(csNelsonSamples${sn})
 	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
 	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem)
-	cs_install_target(csNelsonSamples${sn} csNelsonSamples${sn})
-	cs_finalize_target(csNelsonSamples${sn})
+	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()
 
 
@@ -50,8 +47,7 @@ foreach(s ${SAMPLES_LIST})
 	cs_find_package(csNelsonSamples${sn} PUBLIC csCamera COMPONENTS csCamera REQUIRED)
 	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
 	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem csLie::csLie csCamera::csCamera)
-	cs_install_target(csNelsonSamples${sn} csNelsonSamples${sn})
-	cs_finalize_target(csNelsonSamples${sn})
+	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()
 
 #---------------------------------------------------------------
@@ -65,6 +61,5 @@ foreach(s ${SAMPLES_LIST})
 	cs_add_executable(csNelsonSamples${sn})
 	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
 	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson)
-	cs_install_target(csNelsonSamples${sn} csNelsonSamples${sn})
-	cs_finalize_target(csNelsonSamples${sn})
+	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()

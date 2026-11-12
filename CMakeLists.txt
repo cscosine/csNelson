@@ -4,7 +4,7 @@ project(csNelsonSol VERSION 1.0.0 LANGUAGES CXX)
 # add the csCMake system
 include(csCMake)
 
-cs_initialize_project(csNelsonSol CXX_STANDARD 17
+cs_initialize_project(NAMESPACE csNelson CXX_STANDARD 17
     # add the default configurations supported by this project
     DEFAULT_CONFIG Debug
     DEFAULT_CONFIG Release
@@ -19,6 +19,3 @@ cs_initialize_project(csNelsonSol CXX_STANDARD 17
 add_subdirectory(csNelson)
 add_subdirectory(samples)
 # add_subdirectory(...)
-
-# remember to add this at the end of the main cmake file
-cs_finalize_project(csNelson)
