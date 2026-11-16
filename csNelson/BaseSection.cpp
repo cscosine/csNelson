@@ -1,3 +1,4 @@
+#include <csCore/core/OpenMP.hpp>
 #include <csNelson/BaseSection.hpp>
 
 namespace csNelson {
@@ -18,14 +19,14 @@ void BaseSection::updateHessianBlocks(const ParallelExecSettings& settings) {
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
@@ -34,14 +35,14 @@ void BaseSection::updateHessianBlocks(const ParallelExecSettings& settings) {
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
@@ -50,14 +51,14 @@ void BaseSection::updateHessianBlocks(const ParallelExecSettings& settings) {
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int j = 0; j < this->_computationUnits.size(); j++) {
           for (auto& set : this->_computationUnits[j].updaters) {
             set->updateH(this->_computationUnits[j].transpose);
@@ -65,7 +66,7 @@ void BaseSection::updateHessianBlocks(const ParallelExecSettings& settings) {
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int j = 0; j < this->_computationUnits.size(); j++) {
         for (auto& set : this->_computationUnits[j].updaters) {
           set->updateH(this->_computationUnits[j].transpose);
@@ -93,13 +94,13 @@ void BaseSection::evaluateEdges(const ParallelExecSettings& settings, bool hessi
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
@@ -107,14 +108,14 @@ void BaseSection::evaluateEdges(const ParallelExecSettings& settings, bool hessi
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
         }
 
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
@@ -122,21 +123,21 @@ void BaseSection::evaluateEdges(const ParallelExecSettings& settings, bool hessi
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
         }
 
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize) reduction(+ : chi2))
         for (int i = 0; i < _edgesVector.size(); i++) {
           _edgesVector[i]->update(hessian);
           chi2 += _edgesVector[i]->chi2();
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime) reduction(+ : chi2)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime) reduction(+ : chi2))
       for (int i = 0; i < _edgesVector.size(); i++) {
         _edgesVector[i]->update(hessian);
         chi2 += _edgesVector[i]->chi2();

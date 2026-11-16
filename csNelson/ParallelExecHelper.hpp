@@ -1,7 +1,7 @@
 #pragma once
 
 #include <cassert>
-#include <omp.h>
+#include <csCore/core/OpenMP.hpp>
 
 namespace csNelson {
 
@@ -53,7 +53,7 @@ public:
   }
 
   static int maxSupportedThreads() {
-    return omp_get_max_threads();
+    return csCore::core::ompMaxThreads();
   }
 
   void setChunkSize(int c) {

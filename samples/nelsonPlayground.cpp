@@ -3,7 +3,7 @@
 
 #include <atomic>
 #include <iostream>
-#include <omp.h>
+#include <csCore/core/OpenMP.hpp>
 #include <thread>
 #include <vector>
 
@@ -41,7 +41,7 @@ void testSparseDenseCombinations() {
 
 double parForOuter(const std::vector<std::vector<double>>& v1, const std::vector<std::vector<double>>& v2) {
   double tmp(0);
-#pragma omp parallel for reduction(+ : tmp) schedule(static)
+CS_OMP(parallel for reduction(+ : tmp) schedule(static))
   for (int i = 0; i < v1.size(); i++) {
     tmp += parForInner(i, v1[i], v2[i]);
   }
@@ -52,7 +52,7 @@ double parForInner(int id, const std::vector<double>& v1, const std::vector<doub
   auto entryId = std::this_thread::get_id();
   std::atomic<bool> parallel(false);
   double tmp(0);
-#pragma omp parallel for reduction(+ : tmp)
+CS_OMP(parallel for reduction(+ : tmp))
   for (int i = 0; i < v1.size(); i++) {
     tmp += v1[i] + v2[i];
     if (std::this_thread::get_id() != entryId) {

@@ -1,4 +1,5 @@
 #pragma once
+#include <csCore/core/OpenMP.hpp>
 #include <csNelson/MatrixWtXMultiplier.hpp>
 
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
@@ -66,14 +67,14 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(cons
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -82,14 +83,14 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(cons
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -98,14 +99,14 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(cons
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -113,7 +114,7 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(cons
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int i = 0; i < _blocks.size(); ++i) {
         for (int j = 0; j < _blocks[i].size(); ++j) {
           res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
