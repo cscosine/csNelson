@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <csNelson/DoubleSectionHessian_impl.hpp>
 #include <csNelson/DoubleSection_impl.hpp>
 #include <csNelson/EdgeBinary_impl.hpp>

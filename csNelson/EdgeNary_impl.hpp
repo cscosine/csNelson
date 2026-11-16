@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <csNelson/EdgeNary.hpp>
 #include <csNelson/EdgeSectionBase_impl.hpp>
 

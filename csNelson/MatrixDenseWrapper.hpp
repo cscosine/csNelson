@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <csNelson/Global.hpp>
 
 #include <csBlockMatrix/MatrixTypeTraits.hpp>

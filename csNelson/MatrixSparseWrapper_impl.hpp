@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <csNelson/MatrixSparseWrapper.hpp>
 
 namespace csNelson {
