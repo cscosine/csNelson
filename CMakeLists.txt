@@ -1,4 +1,9 @@
 cmake_minimum_required(VERSION 3.31)
+
+# before project(): the oldest macOS the binaries run on (csCore)
+include(csCMakeSetup)
+cs_macos_deployment_target(13.3)
+
 project(csNelsonSol VERSION 1.0.0 LANGUAGES CXX)
 
 # add the csCMake system
