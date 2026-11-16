@@ -1,4 +1,5 @@
 #pragma once
+#include <csCore/core/OpenMP.hpp>
 #include <csNelson/MatrixWWtMultiplier.hpp>
 
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
@@ -141,13 +142,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
     // static
     if (_settings.schedule() == ParallelSchedule::schedule_static) {
       if (_settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(static))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -157,13 +158,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(static, chunkSize))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -175,13 +176,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
       }
     } else if (_settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (_settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(dynamic))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -191,13 +192,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(dynamic, chunkSize))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -209,13 +210,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
       }
     } else if (_settings.schedule() == ParallelSchedule::schedule_guided) {
       if (_settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(guided))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -225,13 +226,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(guided, chunkSize))
         // first copy U blocks
         for (int i = 0; i < _blockPairsU.size(); i++) {
           _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
         }
         // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int ip = 0; ip < _blockPairs.size(); ip++) {
           typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
           assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists
@@ -242,13 +243,13 @@ void MatrixWWtMultiplier<matOutputType, T, BR, NBR>::multiply(const MatrixBlockU
         }
       }
     } else if (_settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThreadU) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThreadU) default(shared) schedule(runtime))
       // first copy U blocks
       for (int i = 0; i < _blockPairsU.size(); i++) {
         _matOutput.blockByUID(_blockPairsU[i]) = U.blockByUID(i);
       }
       // then subtract W*W' blocks
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int ip = 0; ip < _blockPairs.size(); ip++) {
         typename MatOuputType::BlockType block = _matOutput.blockByUID(ip);
         assert(_blockPairs[ip].size() >= 0); // if exists is not empty or it is 0 if only U block exists

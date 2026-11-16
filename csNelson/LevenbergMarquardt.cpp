@@ -1,3 +1,4 @@
+#include <cassert>
 #include <csNelson/LevenbergMarquardt.hpp>
 #include <csNelson/LevenbergMarquardt_impl.hpp>
 

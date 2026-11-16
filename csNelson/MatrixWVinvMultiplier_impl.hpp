@@ -1,4 +1,5 @@
 #pragma once
+#include <csCore/core/OpenMP.hpp>
 #include <csNelson/MatrixWVinvMultiplier.hpp>
 
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
@@ -38,14 +39,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::multiply(co
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
@@ -54,14 +55,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::multiply(co
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
@@ -70,14 +71,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::multiply(co
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int r = 0; r < W.numBlocksRow(); r++) {
           for (auto it = W.rowBegin(r); it() != it.end(); it++) {
             _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
@@ -85,7 +86,7 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::multiply(co
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int r = 0; r < W.numBlocksRow(); r++) {
         for (auto it = W.rowBegin(r); it() != it.end(); it++) {
           _matOutput.blockByUID(it.blockUID()) = W.blockByUID(it.blockUID()) * Vinv.blockByUID(it.col());
@@ -114,14 +115,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::rightMultVe
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
@@ -130,14 +131,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::rightMultVe
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
@@ -146,14 +147,14 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::rightMultVe
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
           }
         }
       } else {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
           for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
             res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());
@@ -161,7 +162,7 @@ void MatrixWVinvMultiplier<matWType, matVType, T, BR, BC, NBR, NBC>::rightMultVe
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-#pragma omp parallel for num_threads(reqNumThread) default(shared) schedule(runtime)
+CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int r = 0; r < _matOutput.numBlocksRow(); r++) {
         for (auto it = _matOutput.rowBegin(r); it() != it.end(); it++) {
           res.segment(r) -= _matOutput.blockByUID(it.blockUID()) * v.segment(it.col());

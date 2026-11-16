@@ -1,4 +1,5 @@
 #define _USE_MATH_DEFINES
+#include <cassert>
 #include <cmath>
 
 #include <catch2/catch_template_test_macros.hpp>

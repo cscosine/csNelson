@@ -1,4 +1,5 @@
 #pragma once
+#include <cassert>
 #include <csNelson/SingleSection.hpp>
 
 #include <csBlockMatrix/VectorBlock_impl.hpp>
