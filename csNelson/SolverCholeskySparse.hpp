@@ -10,22 +10,20 @@
 
 namespace csNelson {
 
-template <class EigenMatType, class EigenOrderingMethod>
-class SolverCholeskyEigenSparse {
+template <class EigenMatType, class EigenOrderingMethod> class SolverCholeskyEigenSparse {
 
   Eigen::SimplicialLDLT<EigenMatType, Eigen::Upper, EigenOrderingMethod> _ldlt;
 
 public:
-  void init(EigenMatType& mat);
+  void init(EigenMatType &mat);
 
-  bool factorize(EigenMatType& matInput);
+  bool factorize(EigenMatType &matInput);
 
   template <class Derived1, class Derived2>
-  void solve(const Eigen::MatrixBase<Derived1>& b, Eigen::MatrixBase<Derived2>& x);
+  void solve(const Eigen::MatrixBase<Derived1> &b, Eigen::MatrixBase<Derived2> &x);
 };
 
-template <int matTypeV, class T, int B, int NB, class EigenOrderingMethod>
-class SolverCholeskySparseBase {
+template <int matTypeV, class T, int B, int NB, class EigenOrderingMethod> class SolverCholeskySparseBase {
 
 public:
   using MatTraits = csBlockMatrix::MatrixBlockIterableTypeTraits<matTypeV, T, csBlockMatrix::ColMajor, B, B, NB, NB>;
@@ -49,15 +47,14 @@ private:
   SolverType _ldlt;
 
 public:
-  virtual void init(MatType& input, const VecType& b);
+  virtual void init(MatType &input, const VecType &b);
 
   T maxAbsHDiag() const;
-  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda, VecType& result);
+  bool computeIncrement(MatType &input, const VecType &b, T relLambda, T absLambda, VecType &result);
 
-  const Eigen::Solve<SolverType, Eigen::SparseMatrix<T>> solve(const Eigen::SparseMatrix<T>& b) const;
+  const Eigen::Solve<SolverType, Eigen::SparseMatrix<T>> solve(const Eigen::SparseMatrix<T> &b) const;
 
-  template <class Derived>
-  const Eigen::Solve<SolverType, Derived> solve(const Eigen::MatrixBase<Derived>& b) const;
+  template <class Derived> const Eigen::Solve<SolverType, Derived> solve(const Eigen::MatrixBase<Derived> &b) const;
 };
 
 template <int matTypeV, class T, int B, int NB, class EigenOrderingMethod>
@@ -71,17 +68,13 @@ private:
   VecType _incVector;
 
 public:
-  void init(MatType& input, const VecType& b) override;
+  void init(MatType &input, const VecType &b) override;
 
-  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda);
+  bool computeIncrement(MatType &input, const VecType &b, T relLambda, T absLambda);
 
-  const VecType& incrementVector() const {
-    return _incVector;
-  }
+  const VecType &incrementVector() const { return _incVector; }
 
-  T incrementVectorSquaredNorm() const {
-    return _incVector.mat().squaredNorm();
-  }
+  T incrementVectorSquaredNorm() const { return _incVector.mat().squaredNorm(); }
 };
 
 } // namespace csNelson

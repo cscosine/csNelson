@@ -4,8 +4,7 @@
 #include <csNelson/GaussNewton_impl.hpp>
 #include <csNelson/LevenbergMarquardt_impl.hpp>
 
-template <class TestType, template <typename> class Solver>
-void testFunction() {
+template <class TestType, template <typename> class Solver> void testFunction() {
   std::cout << "-------------------------------------------------------" << std::endl;
   TestType pss;
   pss.parametersReady();
@@ -40,12 +39,16 @@ void testFunction() {
   if (pss.matTypeW() != csBlockMatrix::BlockDiagonal && pss.matTypeW() != csBlockMatrix::SparseCoeffBlockDiagonal) {
     for (int i = 0; i < numPoints2d; i++) {
       for (int j = 0; j < numPoints3d; j++) {
-        pss.addEdge(i, j, new EdgeBinaryPoint2d3d<TestType>(i, j, pss.parameterU(i).p2d - pss.parameterV(j).p3d.template head<2>()));
+        pss.addEdge(
+            i, j,
+            new EdgeBinaryPoint2d3d<TestType>(i, j, pss.parameterU(i).p2d - pss.parameterV(j).p3d.template head<2>()));
       }
     }
   } else {
     for (int i = 0; i < std::min(numPoints2d, numPoints3d); i++) {
-      pss.addEdge(i, i, new EdgeBinaryPoint2d3d<TestType>(i, i, pss.parameterU(i).p2d - pss.parameterV(i).p3d.template head<2>()));
+      pss.addEdge(
+          i, i,
+          new EdgeBinaryPoint2d3d<TestType>(i, i, pss.parameterU(i).p2d - pss.parameterV(i).p3d.template head<2>()));
     }
   }
 
@@ -55,8 +58,8 @@ void testFunction() {
 
   {
     using SolverAlgorithm = Solver<typename csNelson::SolverTraits<csNelson::solverCholeskySchur>::Solver<
-        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperDense, csNelson::matrixWrapperDense,
-        csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
+        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperDense,
+        csNelson::matrixWrapperDense, csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
     SolverAlgorithm gn;
     pss.addNoise(0.5);
     auto tc = gn.solve(pss);
@@ -67,8 +70,8 @@ void testFunction() {
 
   {
     using SolverAlgorithm = Solver<typename csNelson::SolverTraits<csNelson::solverCholeskySchur>::Solver<
-        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperDense, csNelson::matrixWrapperSparse,
-        csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
+        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperDense,
+        csNelson::matrixWrapperSparse, csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
     SolverAlgorithm gn;
     pss.addNoise(0.5);
     auto tc = gn.solve(pss);
@@ -78,8 +81,8 @@ void testFunction() {
   }
   {
     using SolverAlgorithm = Solver<typename csNelson::SolverTraits<csNelson::solverCholeskySchur>::Solver<
-        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperSparse, csNelson::matrixWrapperDense,
-        csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
+        typename TestType::Hessian::Traits, csNelson::solverCholeskyDense, csNelson::matrixWrapperSparse,
+        csNelson::matrixWrapperDense, csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
     SolverAlgorithm gn;
     pss.addNoise(0.5);
     auto tc = gn.solve(pss);
@@ -100,8 +103,8 @@ void testFunction() {
   }
   {
     using SolverAlgorithm = Solver<typename csNelson::SolverTraits<csNelson::solverCholeskySchur>::Solver<
-        typename TestType::Hessian::Traits, csNelson::solverCholeskySparse, csNelson::matrixWrapperDense, csNelson::matrixWrapperDense,
-        csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
+        typename TestType::Hessian::Traits, csNelson::solverCholeskySparse, csNelson::matrixWrapperDense,
+        csNelson::matrixWrapperDense, csNelson::choleskyAMDOrdering, csNelson::choleskyAMDOrdering>>;
     SolverAlgorithm gn;
     pss.addNoise(0.5);
     auto tc = gn.solve(pss);

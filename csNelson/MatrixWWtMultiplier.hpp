@@ -17,11 +17,10 @@ struct UIDPair {
 
 using MatrixWWtMultiplierSettings = ParallelExecSettings;
 
-template <int matOutputType, class T, int BR, int NBR>
-class MatrixWWtMultiplier {
+template <int matOutputType, class T, int BR, int NBR> class MatrixWWtMultiplier {
 public:
-  using MatOuputType =
-      typename csBlockMatrix::MatrixBlockIterableTypeTraits<matOutputType, T, csBlockMatrix::ColMajor, BR, BR, NBR, NBR>::MatrixType;
+  using MatOuputType = typename csBlockMatrix::MatrixBlockIterableTypeTraits<matOutputType, T, csBlockMatrix::ColMajor,
+                                                                             BR, BR, NBR, NBR>::MatrixType;
 
   using Settings = MatrixWWtMultiplierSettings;
 
@@ -34,25 +33,18 @@ private:
   Settings _settings;
 
 public:
-  Settings& settings() {
-    return _settings;
-  }
-  const Settings& settings() const {
-    return _settings;
-  }
+  Settings &settings() { return _settings; }
+  const Settings &settings() const { return _settings; }
 
   template <class MatrixBlockU, class MatrixBlockW>
-  void prepare(const MatrixBlockU& U, const MatrixBlockW& Wpattern, const Eigen::SparseMatrix<int, Eigen::RowMajor>* spWmat = nullptr);
+  void prepare(const MatrixBlockU &U, const MatrixBlockW &Wpattern,
+               const Eigen::SparseMatrix<int, Eigen::RowMajor> *spWmat = nullptr);
 
   template <class MatrixBlockU, class MatrixBlockW>
-  void multiply(const MatrixBlockU& U, const MatrixBlockW& A, const MatrixBlockW& B);
+  void multiply(const MatrixBlockU &U, const MatrixBlockW &A, const MatrixBlockW &B);
 
-  const MatOuputType& result() const {
-    return _matOutput;
-  }
-  MatOuputType& result() {
-    return _matOutput;
-  }
+  const MatOuputType &result() const { return _matOutput; }
+  MatOuputType &result() { return _matOutput; }
 };
 
 } // namespace csNelson

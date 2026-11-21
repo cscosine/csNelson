@@ -9,22 +9,20 @@
 
 namespace csNelson {
 
-template <class EigenMatType>
-class SolverCholeskyEigenDense {
+template <class EigenMatType> class SolverCholeskyEigenDense {
   Eigen::LDLT<EigenMatType, Eigen::Upper> _ldlt;
 
 public:
-  void init(EigenMatType& mat);
+  void init(EigenMatType &mat);
 
-  bool factorize(EigenMatType& matInput);
+  bool factorize(EigenMatType &matInput);
 
   template <class Derived1, class Derived2>
-  void solve(const Eigen::MatrixBase<Derived1>& b, Eigen::MatrixBase<Derived2>& x);
+  void solve(const Eigen::MatrixBase<Derived1> &b, Eigen::MatrixBase<Derived2> &x);
 };
 
 //--------------------------------------------------------------------------------------
-template <int matTypeV, class T, int B, int NB = csBlockMatrix::Dynamic>
-class SolverCholeskyDenseBase {
+template <int matTypeV, class T, int B, int NB = csBlockMatrix::Dynamic> class SolverCholeskyDenseBase {
 
 public:
   using MatTraits = csBlockMatrix::MatrixBlockIterableTypeTraits<matTypeV, T, csBlockMatrix::ColMajor, B, B, NB, NB>;
@@ -46,18 +44,19 @@ private:
   Eigen::LDLT<typename DenseWrapperT::MatOutputType, Eigen::Upper> _ldlt;
 
 public:
-  virtual void init(MatType& input, const VecType& b);
+  virtual void init(MatType &input, const VecType &b);
 
   T maxAbsHDiag() const;
 
-  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda, VecType& result);
+  bool computeIncrement(MatType &input, const VecType &b, T relLambda, T absLambda, VecType &result);
 
   template <class Derived>
-  const Eigen::Solve<Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
-                     Derived>
-  solve(const Eigen::MatrixBase<Derived>& b) const;
+  const Eigen::Solve<
+      Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
+      Derived>
+  solve(const Eigen::MatrixBase<Derived> &b) const;
 
-  Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> solve(const Eigen::SparseMatrix<T>& b) const;
+  Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> solve(const Eigen::SparseMatrix<T> &b) const;
 };
 
 //--------------------------------------------------------------------------------------
@@ -71,17 +70,13 @@ private:
   VecType _incVector;
 
 public:
-  void init(MatType& input, const VecType& b) override;
+  void init(MatType &input, const VecType &b) override;
 
-  bool computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda);
+  bool computeIncrement(MatType &input, const VecType &b, T relLambda, T absLambda);
 
-  const VecType& incrementVector() const {
-    return _incVector;
-  }
+  const VecType &incrementVector() const { return _incVector; }
 
-  T incrementVectorSquaredNorm() const {
-    return _incVector.mat().squaredNorm();
-  }
+  T incrementVectorSquaredNorm() const { return _incVector.mat().squaredNorm(); }
 };
 
 } // namespace csNelson

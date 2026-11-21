@@ -14,9 +14,9 @@ constexpr int NBCv = 5;
 
 #define DEBUGOUT if (false)
 
-template <int matWType, int matVType, int BR, int BC, int NBR, int NBC>
-void templateTestFunc() {
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC, NBC, NBC>::MatrixType Vinv;
+template <int matWType, int matVType, int BR, int BC, int NBR, int NBC> void templateTestFunc() {
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC, NBC,
+                                                        NBC>::MatrixType Vinv;
   csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::SPtr spVinv(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>(NBCv, NBCv));
   spVinv->setDiagonal();
@@ -40,7 +40,8 @@ void templateTestFunc() {
   bvOrig.mat().setRandom();
   bv.mat() = bvOrig.mat();
 
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC, NBR, NBC>::MatrixType W;
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC, NBR,
+                                                        NBC>::MatrixType W;
 
   csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::SPtr sp(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>(NBRv, NBCv));
@@ -121,9 +122,9 @@ void templateTestFunc() {
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWVinvMultiplier-VDiagBlock", "[MatrixWVinvMultiplier-VDiagBlock]",
-    ((int matWType, int BR, int BC, int NBR, int NBC), matWType, BR, BC, NBR, NBC), (csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv),
-    (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv),
-    (csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv),
+    ((int matWType, int BR, int BC, int NBR, int NBC), matWType, BR, BC, NBR, NBC),
+    (csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv),
+    (csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv),
     //----------------------------------------
     (csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic),
     (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic),
@@ -196,18 +197,22 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, NBCv),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, NBCv),
     //----------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic)) {
+    (csBlockMatrix::BlockDense, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic)) {
   templateTestFunc<matWType, csBlockMatrix::BlockDiagonal, BR, BC, NBR, NBC>();
 }
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWVinvMultiplier-VDiagCoeff", "[MatrixWVinvMultiplier-VDiagCoeff]",
-    ((int matWType, int BR, int BC, int NBR, int NBC), matWType, BR, BC, NBR, NBC), (csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv),
-    (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv),
-    (csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv),
+    ((int matWType, int BR, int BC, int NBR, int NBC), matWType, BR, BC, NBR, NBC),
+    (csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv),
+    (csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv), (csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv),
     //----------------------------------------
     (csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic),
     (csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic),
@@ -280,9 +285,13 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, NBCv),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, NBCv),
     //----------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic)) {
+    (csBlockMatrix::BlockDense, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic)) {
   templateTestFunc<matWType, csBlockMatrix::SparseCoeffBlockDiagonal, BR, BC, NBR, NBC>();
 }

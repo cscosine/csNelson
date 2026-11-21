@@ -10,15 +10,17 @@
 
 namespace csNelson {
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
+template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType,
+          int choleskyOrderingS>
 SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
                                         choleskyOrderingS>::SolverDiagonalBlocksInverseWWtMultSchur()
-    : _settings(_Vinv.settings(), _WVinv.settings(), _wwtMult.settings(), _WtX.settings())
-    , _uv_maxAbsHDiag(-1) {}
+    : _settings(_Vinv.settings(), _WVinv.settings(), _wwtMult.settings(), _WtX.settings()), _uv_maxAbsHDiag(-1) {}
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-void SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType, choleskyOrderingS>::init(
-    DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b) {
+template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType,
+          int choleskyOrderingS>
+void SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
+                                             choleskyOrderingS>::init(DoubleSectionHessianMatricesT &input,
+                                                                      const DoubleSectionHessianVectorsT &b) {
   _timeStats.startInit = std::chrono::steady_clock::now();
 
   // prepare vectors
@@ -58,17 +60,19 @@ void SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU
   _timeStats.endInit = std::chrono::steady_clock::now();
 }
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
-T SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType, choleskyOrderingS>::maxAbsHDiag()
-    const {
+template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType,
+          int choleskyOrderingS>
+T SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
+                                          choleskyOrderingS>::maxAbsHDiag() const {
   return _uv_maxAbsHDiag;
 }
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType, int choleskyOrderingS>
+template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int SType,
+          int choleskyOrderingS>
 bool SolverDiagonalBlocksInverseWWtMultSchur<matTypeU, matTypeV, matTypeW, T, BU, BV, NBU, NBV, SType,
-                                             choleskyOrderingS>::computeIncrement(DoubleSectionHessianMatricesT& input,
-                                                                                  const DoubleSectionHessianVectorsT& b, T relLambda,
-                                                                                  T absLambda) {
+                                             choleskyOrderingS>::computeIncrement(DoubleSectionHessianMatricesT &input,
+                                                                                  const DoubleSectionHessianVectorsT &b,
+                                                                                  T relLambda, T absLambda) {
   _timeStats.addIteration();
 
   bool ok = true;

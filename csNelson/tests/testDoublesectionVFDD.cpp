@@ -11,36 +11,40 @@
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
 class Points2d3d : public Points2d3dBase<Points2d3d<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
-                                         csBlockMatrix::Variable, Point3d::blockSize, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
+                                         csBlockMatrix::Variable, Point3d::blockSize, csBlockMatrix::Dynamic,
+                                         csBlockMatrix::Dynamic> {
 
   std::vector<int> u_sizes;
 
 public:
-  Points2d3d()
-      : u_sizes(numPoints2d, Point2d::blockSize) {}
-  const std::vector<int>& parameterUSize(void) const override {
-    return u_sizes;
-  }
+  Points2d3d() : u_sizes(numPoints2d, Point2d::blockSize) {}
+  const std::vector<int> &parameterUSize(void) const override { return u_sizes; }
 
-  int numParametersV() const override {
-    return numPoints3d;
-  }
+  int numParametersV() const override { return numPoints3d; }
 };
 
-using PointsSection_DenseDenseDense = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
-using PointsSection_DenseDenseDiago = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal>;
-using PointsSection_DenseDenseSpars = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
+using PointsSection_DenseDenseDense =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
+using PointsSection_DenseDenseDiago =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal>;
+using PointsSection_DenseDenseSpars =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
 using PointsSection_DenseDenseSpaco =
     Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse>;
-using PointsSection_DenseDiagoDense = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense>;
+using PointsSection_DenseDiagoDense =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense>;
 using PointsSection_DenseDiagoDiago =
     Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal>;
-using PointsSection_DenseDiagoSpars = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>;
+using PointsSection_DenseDiagoSpars =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>;
 using PointsSection_DenseDiagoSpaco =
     Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
-using PointsSection_DenseSparsDense = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
-using PointsSection_DenseSparsDiago = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal>;
-using PointsSection_DenseSparsSpars = Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
+using PointsSection_DenseSparsDense =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
+using PointsSection_DenseSparsDiago =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal>;
+using PointsSection_DenseSparsSpars =
+    Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
 using PointsSection_DenseSparsSpaco =
     Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse>;
 using PointsSection_DenseSpacoDense =
@@ -52,10 +56,12 @@ using PointsSection_DenseSpacoSpars =
 using PointsSection_DenseSpacoSpaco =
     Points2d3d<csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse>;
 
-using PointsSection_DiagoDenseDense = Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
+using PointsSection_DiagoDenseDense =
+    Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
 using PointsSection_DiagoDenseDiago =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal>;
-using PointsSection_DiagoDenseSpars = Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
+using PointsSection_DiagoDenseSpars =
+    Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
 using PointsSection_DiagoDenseSpaco =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse>;
 using PointsSection_DiagoDiagoDense =
@@ -66,10 +72,12 @@ using PointsSection_DiagoDiagoSpars =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>;
 using PointsSection_DiagoDiagoSpaco =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
-using PointsSection_DiagoSparsDense = Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
+using PointsSection_DiagoSparsDense =
+    Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
 using PointsSection_DiagoSparsDiago =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal>;
-using PointsSection_DiagoSparsSpars = Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
+using PointsSection_DiagoSparsSpars =
+    Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
 using PointsSection_DiagoSparsSpaco =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse>;
 using PointsSection_DiagoSpacoDense =
@@ -81,20 +89,28 @@ using PointsSection_DiagoSpacoSpars =
 using PointsSection_DiagoSpacoSpaco =
     Points2d3d<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse>;
 
-using PointsSection_SparsDenseDense = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
-using PointsSection_SparsDenseDiago = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal>;
-using PointsSection_SparsDenseSpars = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
+using PointsSection_SparsDenseDense =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockDense>;
+using PointsSection_SparsDenseDiago =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal>;
+using PointsSection_SparsDenseSpars =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse>;
 using PointsSection_SparsDenseSpaco =
     Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse>;
-using PointsSection_SparsDiagoDense = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense>;
+using PointsSection_SparsDiagoDense =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense>;
 using PointsSection_SparsDiagoDiago =
     Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal>;
-using PointsSection_SparsDiagoSpars = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>;
+using PointsSection_SparsDiagoSpars =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>;
 using PointsSection_SparsDiagoSpaco =
     Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
-using PointsSection_SparsSparsDense = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
-using PointsSection_SparsSparsDiago = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal>;
-using PointsSection_SparsSparsSpars = Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
+using PointsSection_SparsSparsDense =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense>;
+using PointsSection_SparsSparsDiago =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal>;
+using PointsSection_SparsSparsSpars =
+    Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse>;
 using PointsSection_SparsSparsSpaco =
     Points2d3d<csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse>;
 using PointsSection_SparsSpacoDense =
@@ -139,27 +155,33 @@ using PointsSection_SpacoSpacoSpars =
 using PointsSection_SpacoSpacoSpaco =
     Points2d3d<csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse>;
 
-TEMPLATE_TEST_CASE(
-    "DoubleSection-", "[DoubleSection-]", PointsSection_DenseDenseDense, PointsSection_DenseDenseDiago, PointsSection_DenseDenseSpars,
-    PointsSection_DenseDenseSpaco, PointsSection_DenseDiagoDense, PointsSection_DenseDiagoDiago, PointsSection_DenseDiagoSpars,
-    PointsSection_DenseDiagoSpaco, PointsSection_DenseSparsDense, PointsSection_DenseSparsDiago, PointsSection_DenseSparsSpars,
-    PointsSection_DenseSparsSpaco, PointsSection_DenseSpacoDense, PointsSection_DenseSpacoDiago, PointsSection_DenseSpacoSpars,
-    PointsSection_DenseSpacoSpaco,
-    //------------------------------------
-    PointsSection_DiagoDenseDense, PointsSection_DiagoDenseDiago, PointsSection_DiagoDenseSpars, PointsSection_DiagoDenseSpaco,
-    PointsSection_DiagoDiagoDense, PointsSection_DiagoDiagoDiago, PointsSection_DiagoDiagoSpars, PointsSection_DiagoDiagoSpaco,
-    PointsSection_DiagoSparsDense, PointsSection_DiagoSparsDiago, PointsSection_DiagoSparsSpars, PointsSection_DiagoSparsSpaco,
-    PointsSection_DiagoSpacoDense, PointsSection_DiagoSpacoDiago, PointsSection_DiagoSpacoSpars, PointsSection_DiagoSpacoSpaco,
-    //------------------------------------
-    PointsSection_SparsDenseDense, PointsSection_SparsDenseDiago, PointsSection_SparsDenseSpars, PointsSection_SparsDenseSpaco,
-    PointsSection_SparsDiagoDense, PointsSection_SparsDiagoDiago, PointsSection_SparsDiagoSpars, PointsSection_SparsDiagoSpaco,
-    PointsSection_SparsSparsDense, PointsSection_SparsSparsDiago, PointsSection_SparsSparsSpars, PointsSection_SparsSparsSpaco,
-    PointsSection_SparsSpacoDense, PointsSection_SparsSpacoDiago, PointsSection_SparsSpacoSpars, PointsSection_SparsSpacoSpaco,
-    //------------------------------------
-    PointsSection_SpacoDenseDense, PointsSection_SpacoDenseDiago, PointsSection_SpacoDenseSpars, PointsSection_SpacoDenseSpaco,
-    PointsSection_SpacoDiagoDense, PointsSection_SpacoDiagoDiago, PointsSection_SpacoDiagoSpars, PointsSection_SpacoDiagoSpaco,
-    PointsSection_SpacoSparsDense, PointsSection_SpacoSparsDiago, PointsSection_SpacoSparsSpars, PointsSection_SpacoSparsSpaco,
-    PointsSection_SpacoSpacoDense, PointsSection_SpacoSpacoDiago, PointsSection_SpacoSpacoSpars, PointsSection_SpacoSpacoSpaco) {
+TEMPLATE_TEST_CASE("DoubleSection-", "[DoubleSection-]", PointsSection_DenseDenseDense, PointsSection_DenseDenseDiago,
+                   PointsSection_DenseDenseSpars, PointsSection_DenseDenseSpaco, PointsSection_DenseDiagoDense,
+                   PointsSection_DenseDiagoDiago, PointsSection_DenseDiagoSpars, PointsSection_DenseDiagoSpaco,
+                   PointsSection_DenseSparsDense, PointsSection_DenseSparsDiago, PointsSection_DenseSparsSpars,
+                   PointsSection_DenseSparsSpaco, PointsSection_DenseSpacoDense, PointsSection_DenseSpacoDiago,
+                   PointsSection_DenseSpacoSpars, PointsSection_DenseSpacoSpaco,
+                   //------------------------------------
+                   PointsSection_DiagoDenseDense, PointsSection_DiagoDenseDiago, PointsSection_DiagoDenseSpars,
+                   PointsSection_DiagoDenseSpaco, PointsSection_DiagoDiagoDense, PointsSection_DiagoDiagoDiago,
+                   PointsSection_DiagoDiagoSpars, PointsSection_DiagoDiagoSpaco, PointsSection_DiagoSparsDense,
+                   PointsSection_DiagoSparsDiago, PointsSection_DiagoSparsSpars, PointsSection_DiagoSparsSpaco,
+                   PointsSection_DiagoSpacoDense, PointsSection_DiagoSpacoDiago, PointsSection_DiagoSpacoSpars,
+                   PointsSection_DiagoSpacoSpaco,
+                   //------------------------------------
+                   PointsSection_SparsDenseDense, PointsSection_SparsDenseDiago, PointsSection_SparsDenseSpars,
+                   PointsSection_SparsDenseSpaco, PointsSection_SparsDiagoDense, PointsSection_SparsDiagoDiago,
+                   PointsSection_SparsDiagoSpars, PointsSection_SparsDiagoSpaco, PointsSection_SparsSparsDense,
+                   PointsSection_SparsSparsDiago, PointsSection_SparsSparsSpars, PointsSection_SparsSparsSpaco,
+                   PointsSection_SparsSpacoDense, PointsSection_SparsSpacoDiago, PointsSection_SparsSpacoSpars,
+                   PointsSection_SparsSpacoSpaco,
+                   //------------------------------------
+                   PointsSection_SpacoDenseDense, PointsSection_SpacoDenseDiago, PointsSection_SpacoDenseSpars,
+                   PointsSection_SpacoDenseSpaco, PointsSection_SpacoDiagoDense, PointsSection_SpacoDiagoDiago,
+                   PointsSection_SpacoDiagoSpars, PointsSection_SpacoDiagoSpaco, PointsSection_SpacoSparsDense,
+                   PointsSection_SpacoSparsDiago, PointsSection_SpacoSparsSpars, PointsSection_SpacoSparsSpaco,
+                   PointsSection_SpacoSpacoDense, PointsSection_SpacoSpacoDiago, PointsSection_SpacoSpacoSpars,
+                   PointsSection_SpacoSpacoSpaco) {
 
   testFunction<TestType, csNelson::GaussNewton>();
   testFunction<TestType, csNelson::LevenbergMarquardt>();

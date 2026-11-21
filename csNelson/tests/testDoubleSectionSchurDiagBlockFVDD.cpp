@@ -4,22 +4,17 @@
 #include <csNelson/testDoubleSectionSchurCommon_impl.hpp>
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
-class Points2d3dFVDD
-    : public Points2d3dBase<Points2d3dFVDD<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv, Point2d::blockSize,
-                            csBlockMatrix::Variable, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
+class Points2d3dFVDD : public Points2d3dBase<Points2d3dFVDD<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv,
+                                             matTypeWv, Point2d::blockSize, csBlockMatrix::Variable,
+                                             csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
   std::vector<int> v_sizes;
 
 public:
-  Points2d3dFVDD()
-      : v_sizes(numPoints3d, Point3d::blockSize) {}
+  Points2d3dFVDD() : v_sizes(numPoints3d, Point3d::blockSize) {}
 
-  const std::vector<int>& parameterVSize(void) const override {
-    return v_sizes;
-  }
+  const std::vector<int> &parameterVSize(void) const override { return v_sizes; }
 
-  int numParametersU() const override {
-    return numPoints2d;
-  }
+  int numParametersU() const override { return numPoints2d; }
 };
 
 using PointsSectionFVDD_DenseDiagoDense =
@@ -55,12 +50,15 @@ using PointsSectionFVDD_SpacoDiagoSpars =
 using PointsSectionFVDD_SpacoDiagoSpaco =
     Points2d3dFVDD<csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
 
-TEMPLATE_TEST_CASE("DoubleSection-FVDD", "[DoubleSection-FVDD]", PointsSectionFVDD_DenseDiagoDense, PointsSectionFVDD_DenseDiagoDiago,
-                   PointsSectionFVDD_DenseDiagoSpars, PointsSectionFVDD_DenseDiagoSpaco, PointsSectionFVDD_DiagoDiagoDense,
-                   PointsSectionFVDD_DiagoDiagoDiago, PointsSectionFVDD_DiagoDiagoSpars, PointsSectionFVDD_DiagoDiagoSpaco,
-                   PointsSectionFVDD_SparsDiagoDense, PointsSectionFVDD_SparsDiagoDiago, PointsSectionFVDD_SparsDiagoSpars,
-                   PointsSectionFVDD_SparsDiagoSpaco, PointsSectionFVDD_SpacoDiagoDense, PointsSectionFVDD_SpacoDiagoDiago,
-                   PointsSectionFVDD_SpacoDiagoSpars, PointsSectionFVDD_SpacoDiagoSpaco) {
+TEMPLATE_TEST_CASE("DoubleSection-FVDD", "[DoubleSection-FVDD]", PointsSectionFVDD_DenseDiagoDense,
+                   PointsSectionFVDD_DenseDiagoDiago, PointsSectionFVDD_DenseDiagoSpars,
+                   PointsSectionFVDD_DenseDiagoSpaco, PointsSectionFVDD_DiagoDiagoDense,
+                   PointsSectionFVDD_DiagoDiagoDiago, PointsSectionFVDD_DiagoDiagoSpars,
+                   PointsSectionFVDD_DiagoDiagoSpaco, PointsSectionFVDD_SparsDiagoDense,
+                   PointsSectionFVDD_SparsDiagoDiago, PointsSectionFVDD_SparsDiagoSpars,
+                   PointsSectionFVDD_SparsDiagoSpaco, PointsSectionFVDD_SpacoDiagoDense,
+                   PointsSectionFVDD_SpacoDiagoDiago, PointsSectionFVDD_SpacoDiagoSpars,
+                   PointsSectionFVDD_SpacoDiagoSpaco) {
 
   testFunction<TestType, csNelson::GaussNewton>();
   testFunction<TestType, csNelson::LevenbergMarquardt>();

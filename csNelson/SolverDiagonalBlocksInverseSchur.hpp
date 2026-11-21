@@ -38,30 +38,25 @@ struct SolverDiagonalBlocksInverseSchurIterationTimeStat {
   std::chrono::steady_clock::time_point t8_bUComputed;
   std::chrono::steady_clock::time_point t9_bVtildeComputed;
   std::chrono::steady_clock::time_point t10_bVComputed;
-  std::string toString(const std::string& linePrefix = "") const;
+  std::string toString(const std::string &linePrefix = "") const;
 };
 
 struct SolverDiagonalBlocksInverseSchurTimeStats {
   std::chrono::steady_clock::time_point startInit;
   std::chrono::steady_clock::time_point endInit;
   std::vector<SolverDiagonalBlocksInverseSchurIterationTimeStat> iterations;
-  SolverDiagonalBlocksInverseSchurIterationTimeStat& lastIteration() {
-    return iterations.back();
-  }
-  void addIteration() {
-    iterations.push_back(SolverDiagonalBlocksInverseSchurIterationTimeStat());
-  }
-  std::string toString(const std::string& linePrefix = "") const;
+  SolverDiagonalBlocksInverseSchurIterationTimeStat &lastIteration() { return iterations.back(); }
+  void addIteration() { iterations.push_back(SolverDiagonalBlocksInverseSchurIterationTimeStat()); }
+  std::string toString(const std::string &linePrefix = "") const;
 };
 
 struct SolverDiagonalBlocksInverseSchurSettings {
-  MatrixDiagInvSettings& settings;
-  SolverDiagonalBlocksInverseSchurSettings(MatrixDiagInvSettings& settings)
-      : settings(settings) {}
+  MatrixDiagInvSettings &settings;
+  SolverDiagonalBlocksInverseSchurSettings(MatrixDiagInvSettings &settings) : settings(settings) {}
 };
 
-template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType, int wrapperWType,
-          int choleskyOrderingS>
+template <int matTypeU, int matTypeV, int matTypeW, class T, int BU, int BV, int NBU, int NBV, int wrapperUType,
+          int wrapperWType, int choleskyOrderingS>
 class SolverDiagonalBlocksInverseSchur {
 
 public:
@@ -80,14 +75,16 @@ private:
   typename DoubleSectionHessianVectorsT::VecTypeV::StorageType _bVtilde;
 
   MatrixDiagInv<matTypeV, T, BV, NBV, csBlockMatrix::BlockCoeffSparse> _matrixVInv;
-  typename MatrixWrapperTraits<wrapperWType>::template Wrapper<matTypeW, T, csBlockMatrix::RowMajor, BU, BV, NBU, NBV> _matrixW;
+  typename MatrixWrapperTraits<wrapperWType>::template Wrapper<matTypeW, T, csBlockMatrix::RowMajor, BU, BV, NBU, NBV>
+      _matrixW;
 
-  using MatrixUType =
-      typename MatrixWrapperTraits<wrapperUType>::template Wrapper<matTypeU, T, csBlockMatrix::ColMajor, BU, BU, NBU, NBU>;
+  using MatrixUType = typename MatrixWrapperTraits<wrapperUType>::template Wrapper<matTypeU, T, csBlockMatrix::ColMajor,
+                                                                                   BU, BU, NBU, NBU>;
   MatrixUType _matrixU;
   typename MatrixUType::MatOutputType _matrixS;
 
-  typename SolverTraits<wrapperUType>::template SolverEigen<typename MatrixUType::MatOutputType, choleskyOrderingS> _solverS;
+  typename SolverTraits<wrapperUType>::template SolverEigen<typename MatrixUType::MatOutputType, choleskyOrderingS>
+      _solverS;
 
   bool _firstTime;
   T _v_maxAbsHDiag;
@@ -98,26 +95,19 @@ private:
 public:
   SolverDiagonalBlocksInverseSchur();
 
-  Settings& settings() {
-    return _settings;
-  }
-  const Settings& settings() const {
-    return _settings;
-  }
+  Settings &settings() { return _settings; }
+  const Settings &settings() const { return _settings; }
 
-  const SolverDiagonalBlocksInverseSchurTimeStats& timingStats() const {
-    return _timeStats;
-  }
+  const SolverDiagonalBlocksInverseSchurTimeStats &timingStats() const { return _timeStats; }
 
-  void init(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b);
+  void init(DoubleSectionHessianMatricesT &input, const DoubleSectionHessianVectorsT &b);
 
   T maxAbsHDiag() const;
 
-  bool computeIncrement(DoubleSectionHessianMatricesT& input, const DoubleSectionHessianVectorsT& b, T relLambda, T absLambda);
+  bool computeIncrement(DoubleSectionHessianMatricesT &input, const DoubleSectionHessianVectorsT &b, T relLambda,
+                        T absLambda);
 
-  const DoubleSectionHessianVectorsT& incrementVector() const {
-    return _incVector;
-  }
+  const DoubleSectionHessianVectorsT &incrementVector() const { return _incVector; }
 
   T incrementVectorSquaredNorm() const {
     return _incVector.bU().mat().squaredNorm() + _incVector.bV().mat().squaredNorm();

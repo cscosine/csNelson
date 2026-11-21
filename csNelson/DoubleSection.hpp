@@ -21,64 +21,43 @@
 
 namespace csNelson {
 
-template <int B, int NB>
-class BaseNumSizeParametersU {
+template <int B, int NB> class BaseNumSizeParametersU {
 public:
-  constexpr int parameterUSize() const {
-    return B;
-  }
-  constexpr int numParametersU() const {
-    return NB;
-  }
-  constexpr int parameterUSizePermuted(const Eigen::VectorXi& user2interal) const {
-    return B;
-  }
+  constexpr int parameterUSize() const { return B; }
+  constexpr int numParametersU() const { return NB; }
+  constexpr int parameterUSizePermuted(const Eigen::VectorXi &user2interal) const { return B; }
 };
 
-template <int B>
-class BaseNumSizeParametersU<B, csBlockMatrix::Dynamic> {
+template <int B> class BaseNumSizeParametersU<B, csBlockMatrix::Dynamic> {
 public:
-  constexpr int parameterUSize() const {
-    return B;
-  }
+  constexpr int parameterUSize() const { return B; }
   virtual int numParametersU() const = 0;
-  constexpr int parameterUSizePermuted(const Eigen::VectorXi& user2interal) const {
-    return B;
-  }
+  constexpr int parameterUSizePermuted(const Eigen::VectorXi &user2interal) const { return B; }
 };
 
-template <int NB>
-class BaseNumSizeParametersU<csBlockMatrix::Dynamic, NB> {
+template <int NB> class BaseNumSizeParametersU<csBlockMatrix::Dynamic, NB> {
 public:
   virtual int parameterUSize() const = 0;
-  constexpr int numParametersU() const {
-    return NB;
-  }
-  int parameterUSizePermuted(const Eigen::VectorXi& user2interal) const {
-    return parameterUSize();
-  }
+  constexpr int numParametersU() const { return NB; }
+  int parameterUSizePermuted(const Eigen::VectorXi &user2interal) const { return parameterUSize(); }
 };
 
-template <>
-class BaseNumSizeParametersU<csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
+template <> class BaseNumSizeParametersU<csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
 public:
   virtual int parameterUSize() const = 0;
   virtual int numParametersU() const = 0;
-  int parameterUSizePermuted(const Eigen::VectorXi& user2interal) const {
-    return parameterUSize();
-  }
+  int parameterUSizePermuted(const Eigen::VectorXi &user2interal) const { return parameterUSize(); }
 };
 
-template <int NB>
-class BaseNumSizeParametersU<csBlockMatrix::Variable, NB> {
+template <int NB> class BaseNumSizeParametersU<csBlockMatrix::Variable, NB> {
 public:
-  virtual const std::vector<int>& parameterUSize() const = 0;
+  virtual const std::vector<int> &parameterUSize() const = 0;
   constexpr int numParametersU() const {
     assert(this->parameterUSize().size() == NB);
     return NB;
   }
-  std::vector<int> parameterUSizePermuted(const Eigen::VectorXi& user2internal) const {
-    const auto& parsize = this->parameterUSize();
+  std::vector<int> parameterUSizePermuted(const Eigen::VectorXi &user2internal) const {
+    const auto &parsize = this->parameterUSize();
     std::vector<int> ret(user2internal.size());
     for (int i = 0; i < ret.size(); i++) {
       ret[user2internal(i)] = parsize[i];
@@ -87,15 +66,12 @@ public:
   }
 };
 
-template <>
-class BaseNumSizeParametersU<csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
+template <> class BaseNumSizeParametersU<csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
 public:
-  virtual const std::vector<int>& parameterUSize() const = 0;
-  int numParametersU() const {
-    return parameterUSize().size();
-  }
-  std::vector<int> parameterUSizePermuted(const Eigen::VectorXi& user2internal) const {
-    const auto& parsize = this->parameterUSize();
+  virtual const std::vector<int> &parameterUSize() const = 0;
+  int numParametersU() const { return parameterUSize().size(); }
+  std::vector<int> parameterUSizePermuted(const Eigen::VectorXi &user2internal) const {
+    const auto &parsize = this->parameterUSize();
     std::vector<int> ret(user2internal.size());
     for (int i = 0; i < ret.size(); i++) {
       ret[user2internal(i)] = parsize[i];
@@ -106,77 +82,63 @@ public:
 
 //-----------------------------------------------------------------------------------------------------
 
-template <int B, int NB>
-class BaseNumSizeParametersV {
+template <int B, int NB> class BaseNumSizeParametersV {
 public:
-  constexpr int parameterVSize() const {
-    return B;
-  }
-  constexpr int numParametersV() const {
-    return NB;
-  }
+  constexpr int parameterVSize() const { return B; }
+  constexpr int numParametersV() const { return NB; }
 };
 
-template <int B>
-class BaseNumSizeParametersV<B, csBlockMatrix::Dynamic> {
+template <int B> class BaseNumSizeParametersV<B, csBlockMatrix::Dynamic> {
 public:
-  constexpr int parameterVSize() const {
-    return B;
-  }
+  constexpr int parameterVSize() const { return B; }
   virtual int numParametersV() const = 0;
 };
 
-template <int NB>
-class BaseNumSizeParametersV<csBlockMatrix::Dynamic, NB> {
+template <int NB> class BaseNumSizeParametersV<csBlockMatrix::Dynamic, NB> {
 public:
   virtual int parameterVSize() const = 0;
-  constexpr int numParametersV() const {
-    return NB;
-  }
+  constexpr int numParametersV() const { return NB; }
 };
 
-template <>
-class BaseNumSizeParametersV<csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
+template <> class BaseNumSizeParametersV<csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
 public:
   virtual int parameterVSize() const = 0;
   virtual int numParametersV() const = 0;
 };
 
-template <int NB>
-class BaseNumSizeParametersV<csBlockMatrix::Variable, NB> {
+template <int NB> class BaseNumSizeParametersV<csBlockMatrix::Variable, NB> {
 public:
-  virtual const std::vector<int>& parameterVSize() const = 0;
+  virtual const std::vector<int> &parameterVSize() const = 0;
   constexpr int numParametersV() const {
     assert(this->parameterVSize().size() == NB);
     return NB;
   }
 };
 
-template <>
-class BaseNumSizeParametersV<csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
+template <> class BaseNumSizeParametersV<csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
 public:
-  virtual const std::vector<int>& parameterVSize() const = 0;
-  int numParametersV() const {
-    return parameterVSize().size();
-  }
+  virtual const std::vector<int> &parameterVSize() const = 0;
+  int numParametersV() const { return parameterVSize().size(); }
 };
 
 //-----------------------------------------------------------------------------------------------------
 
-template <class DoubleSection, class EdgeBinaryParameter1_T, class EdgeBinaryParameter2_T>
-struct EdgeSameSection {
+template <class DoubleSection, class EdgeBinaryParameter1_T, class EdgeBinaryParameter2_T> struct EdgeSameSection {
   static constexpr bool value = true;
 };
 
 template <class DoubleSection>
-struct EdgeSameSection<DoubleSection, typename DoubleSection::EdgeBinaryParameter1_U, typename DoubleSection::EdgeBinaryParameter2_V> {
+struct EdgeSameSection<DoubleSection, typename DoubleSection::EdgeBinaryParameter1_U,
+                       typename DoubleSection::EdgeBinaryParameter2_V> {
   static constexpr bool value = false;
 };
 
 //-----------------------------------------------------------------------------------------------------
-template <class Derived, class ParUT, class ParVT, int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv, int BVv,
-          int NBUv = csBlockMatrix::Dynamic, int NBVv = csBlockMatrix::Dynamic>
-class DoubleSection : public BaseNumSizeParametersU<BUv, NBUv>, public BaseNumSizeParametersV<BVv, NBVv>, public BaseSection {
+template <class Derived, class ParUT, class ParVT, int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv,
+          int BVv, int NBUv = csBlockMatrix::Dynamic, int NBVv = csBlockMatrix::Dynamic>
+class DoubleSection : public BaseNumSizeParametersU<BUv, NBUv>,
+                      public BaseNumSizeParametersV<BVv, NBVv>,
+                      public BaseSection {
 
 public:
   using Hessian = DoubleSectionHessian<matTypeUv, matTypeVv, matTypeWv, Tv, BUv, BVv, NBUv, NBVv>;
@@ -191,8 +153,8 @@ public:
   using ParameterTypeV = ParVT;
 
 private:
-  // once the number of params is known (parametersReady() called), _sparsityPattern is allocated and _edgeSetter too, ready to receive
-  // edges
+  // once the number of params is known (parametersReady() called), _sparsityPattern is allocated and _edgeSetter too,
+  // ready to receive edges
   std::shared_ptr<csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>> _sparsityPatternU, _sparsityPatternV;
   std::shared_ptr<csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>> _sparsityPatternW;
 
@@ -207,28 +169,20 @@ private:
   void updateHessianBlocks();
   void evaluateEdges(bool hessian);
 
-  void setChi2(double v) override {
-    _hessian.setChi2(v);
-  }
+  void setChi2(double v) override { _hessian.setChi2(v); }
 
 public:
-  constexpr int matTypeU() const {
-    return matTypeUv;
-  }
-  constexpr int matTypeV() const {
-    return matTypeVv;
-  }
-  constexpr int matTypeW() const {
-    return matTypeWv;
-  }
+  constexpr int matTypeU() const { return matTypeUv; }
+  constexpr int matTypeV() const { return matTypeVv; }
+  constexpr int matTypeW() const { return matTypeWv; }
 
   DoubleSection();
   virtual ~DoubleSection();
 
-  virtual const ParUT& parameterU(NodeId i) const = 0;
-  virtual ParUT& parameterU(NodeId i) = 0;
-  virtual const ParVT& parameterV(NodeId i) const = 0;
-  virtual ParVT& parameterV(NodeId i) = 0;
+  virtual const ParUT &parameterU(NodeId i) const = 0;
+  virtual ParUT &parameterU(NodeId i) = 0;
+  virtual const ParVT &parameterV(NodeId i) const = 0;
+  virtual ParVT &parameterV(NodeId i) = 0;
 
   virtual int numFixedParametersU() const {
     // override if have fixed parameters
@@ -239,38 +193,32 @@ public:
     return 0;
   }
 
-  const Eigen::Matrix<int, NBUv, 1>& user2internalIndexesU() const {
-    return _user2internalIndexesU;
-  }
+  const Eigen::Matrix<int, NBUv, 1> &user2internalIndexesU() const { return _user2internalIndexesU; }
 
-  void setUser2InternalIndexesU(const Eigen::Matrix<int, NBUv, 1>& v);
+  void setUser2InternalIndexesU(const Eigen::Matrix<int, NBUv, 1> &v);
 
   void permuteAMD_SchurU();
 
   void parametersReady(); // client has to call this method when numParameters() is known
   void structureReady();  // client has to call this method when all edges have been added
 
-  const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>& sparsityPatternU() const {
+  const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor> &sparsityPatternU() const {
     assert(_sparsityPatternU != nullptr);
     return *_sparsityPatternU;
   }
-  const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>& sparsityPatternV() const {
+  const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor> &sparsityPatternV() const {
     assert(_sparsityPatternV != nullptr);
     return *_sparsityPatternV;
   }
-  const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>& sparsityPatternW() const {
+  const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor> &sparsityPatternW() const {
     assert(_sparsityPatternW != nullptr);
     return *_sparsityPatternW;
   }
 
-  const Hessian& hessian() const {
-    return _hessian;
-  }
+  const Hessian &hessian() const { return _hessian; }
 
   // friend only for gauss newton??
-  Hessian& hessian() {
-    return _hessian;
-  }
+  Hessian &hessian() { return _hessian; }
 
   typename Hessian::MatTraitsU::MatrixType::BlockType hessianUBlockByUID(int uid) {
     return _hessian.U().blockByUID(uid);
@@ -282,23 +230,15 @@ public:
     return _hessian.W().blockByUID(uid);
   }
 
-  typename Hessian::VecTypeU::SegmentType bUVectorSegment(int pid) {
-    return _hessian.bU().segment(pid);
-  }
-  typename Hessian::VecTypeV::SegmentType bVVectorSegment(int pid) {
-    return _hessian.bV().segment(pid);
-  }
+  typename Hessian::VecTypeU::SegmentType bUVectorSegment(int pid) { return _hessian.bU().segment(pid); }
+  typename Hessian::VecTypeV::SegmentType bVVectorSegment(int pid) { return _hessian.bV().segment(pid); }
 
   void update(bool hessian);
 
-  BaseSectionSettings& settings() {
-    return _settings;
-  }
-  const BaseSectionSettings& settings() const {
-    return _settings;
-  }
+  BaseSectionSettings &settings() { return _settings; }
+  const BaseSectionSettings &settings() const { return _settings; }
 
-  Tv computeRhoChi2Change(Tv mu, const HessianVectorsT& incV, Tv oldChi2) const {
+  Tv computeRhoChi2Change(Tv mu, const HessianVectorsT &incV, Tv oldChi2) const {
     Tv newChi2 = hessian().chi2();
     Tv num = (oldChi2 - newChi2);
     auto den = incV.bU().mat().transpose() * (mu * incV.bU().mat() - hessian().b().bU().mat()) +
@@ -314,17 +254,13 @@ public:
     using HBlockType = typename Hessian::MatTraitsU::MatrixType::BlockType;
     using BSegmentType = typename Hessian::VecTypeU::SegmentType;
 
-    static const ParameterType& parameter(const Derived& section, NodeId id) {
-      return section.parameterU(id);
-    }
-    static HBlockType HBlock(Derived& section, int uid) {
-      return section.hessianUBlockByUID(uid);
-    }
-    static BSegmentType bSegment(Derived& section, int par_id) {
+    static const ParameterType &parameter(const Derived &section, NodeId id) { return section.parameterU(id); }
+    static HBlockType HBlock(Derived &section, int uid) { return section.hessianUBlockByUID(uid); }
+    static BSegmentType bSegment(Derived &section, int par_id) {
       return section.bUVectorSegment(section.user2internalIndexesU()(par_id));
     }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer(Derived &section) {
       return section._edgeSetterComputerU;
     }
   };
@@ -335,30 +271,22 @@ public:
     using HBlockType = typename Hessian::MatTraitsV::MatrixType::BlockType;
     using BSegmentType = typename Hessian::VecTypeV::SegmentType;
 
-    static const ParameterType& parameter(const Derived& section, NodeId id) {
-      return section.parameterV(id);
-    }
-    static HBlockType HBlock(Derived& section, int uid) {
-      return section.hessianVBlockByUID(uid);
-    }
-    static BSegmentType bSegment(Derived& section, int par_id) {
-      return section.bVVectorSegment(par_id);
-    }
+    static const ParameterType &parameter(const Derived &section, NodeId id) { return section.parameterV(id); }
+    static HBlockType HBlock(Derived &section, int uid) { return section.hessianVBlockByUID(uid); }
+    static BSegmentType bSegment(Derived &section, int par_id) { return section.bVVectorSegment(par_id); }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer(Derived &section) {
       return section._edgeSetterComputerV;
     }
   };
   template <class EdgeUnaryAdapter, class EdgeDerived>
   using EdgeUnary = EdgeUnarySectionBaseCRPT<Derived, EdgeUnaryAdapter, EdgeDerived>;
 
-  template <class EdgeDerived>
-  using EdgeUnaryU = EdgeUnary<EdgeUnaryUAdapter, EdgeDerived>;
-  template <class EdgeDerived>
-  using EdgeUnaryV = EdgeUnary<EdgeUnaryVAdapter, EdgeDerived>;
+  template <class EdgeDerived> using EdgeUnaryU = EdgeUnary<EdgeUnaryUAdapter, EdgeDerived>;
+  template <class EdgeDerived> using EdgeUnaryV = EdgeUnary<EdgeUnaryVAdapter, EdgeDerived>;
 
   template <class EdgeUnaryAdapter, class EdgeDerived>
-  void addEdge(NodeId i, EdgeUnary<EdgeUnaryAdapter, EdgeDerived>* e);
+  void addEdge(NodeId i, EdgeUnary<EdgeUnaryAdapter, EdgeDerived> *e);
 
   //-------------------------------------------------------------------------------------------
 
@@ -371,10 +299,10 @@ public:
   using EdgeNaryV = EdgeNarySectionBaseCRPT<Derived, N, EdgeUnaryVAdapter, EdgeDerived>;
 
   template <class EdgeUnaryAdapterT, class EdgeDerived, int N>
-  void addEdge(const std::array<NodeId, N>& ids, EdgeNary<EdgeUnaryAdapterT, EdgeDerived, N>* e);
+  void addEdge(const std::array<NodeId, N> &ids, EdgeNary<EdgeUnaryAdapterT, EdgeDerived, N> *e);
 
   template <class EdgeUnaryAdapterT, class EdgeDerived>
-  void addEdge(const std::vector<NodeId>& ids, EdgeNary<EdgeUnaryAdapterT, EdgeDerived, csBlockMatrix::Dynamic>* e);
+  void addEdge(const std::vector<NodeId> &ids, EdgeNary<EdgeUnaryAdapterT, EdgeDerived, csBlockMatrix::Dynamic> *e);
 
   //-------------------------------------------------------------------------------------------
   struct EdgeBinaryParameter1_U {
@@ -383,17 +311,13 @@ public:
     using H_11_BlockType = typename Hessian::MatTraitsU::MatrixType::BlockType;
     using B_1_SegmentType = typename Hessian::VecTypeU::SegmentType;
 
-    static const Parameter_1_Type& parameter1(const Derived& section, NodeId id) {
-      return section.parameterU(id);
-    }
-    static H_11_BlockType H_11_Block(Derived& section, int uid) {
-      return section.hessianUBlockByUID(uid);
-    }
-    static B_1_SegmentType b_1_Segment(Derived& section, int par_id) {
+    static const Parameter_1_Type &parameter1(const Derived &section, NodeId id) { return section.parameterU(id); }
+    static H_11_BlockType H_11_Block(Derived &section, int uid) { return section.hessianUBlockByUID(uid); }
+    static B_1_SegmentType b_1_Segment(Derived &section, int par_id) {
       return section.bUVectorSegment(section.user2internalIndexesU()(par_id));
     }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer1(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer1(Derived &section) {
       return section._edgeSetterComputerU;
     }
   };
@@ -403,17 +327,11 @@ public:
     using H_11_BlockType = typename Hessian::MatTraitsV::MatrixType::BlockType;
     using B_1_SegmentType = typename Hessian::VecTypeV::SegmentType;
 
-    static const Parameter_1_Type& parameter1(const Derived& section, NodeId id) {
-      return section.parameterV(id);
-    }
-    static H_11_BlockType H_11_Block(Derived& section, int uid) {
-      return section.hessianVBlockByUID(uid);
-    }
-    static B_1_SegmentType b_1_Segment(Derived& section, int par_id) {
-      return section.bVVectorSegment(par_id);
-    }
+    static const Parameter_1_Type &parameter1(const Derived &section, NodeId id) { return section.parameterV(id); }
+    static H_11_BlockType H_11_Block(Derived &section, int uid) { return section.hessianVBlockByUID(uid); }
+    static B_1_SegmentType b_1_Segment(Derived &section, int par_id) { return section.bVVectorSegment(par_id); }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer1(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer1(Derived &section) {
       return section._edgeSetterComputerV;
     }
   };
@@ -424,17 +342,13 @@ public:
     using H_22_BlockType = typename Hessian::MatTraitsU::MatrixType::BlockType;
     using B_2_SegmentType = typename Hessian::VecTypeU::SegmentType;
 
-    static const Parameter_2_Type& parameter2(const Derived& section, NodeId id) {
-      return section.parameterU(id);
-    }
-    static H_22_BlockType H_22_Block(Derived& section, int uid) {
-      return section.hessianUBlockByUID(uid);
-    }
-    static B_2_SegmentType b_2_Segment(Derived& section, int par_id) {
+    static const Parameter_2_Type &parameter2(const Derived &section, NodeId id) { return section.parameterU(id); }
+    static H_22_BlockType H_22_Block(Derived &section, int uid) { return section.hessianUBlockByUID(uid); }
+    static B_2_SegmentType b_2_Segment(Derived &section, int par_id) {
       return section.bUVectorSegment(section.user2internalIndexesU()(par_id));
     }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer2(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer2(Derived &section) {
       return section._edgeSetterComputerU;
     }
   };
@@ -444,17 +358,11 @@ public:
     using H_22_BlockType = typename Hessian::MatTraitsV::MatrixType::BlockType;
     using B_2_SegmentType = typename Hessian::VecTypeV::SegmentType;
 
-    static const Parameter_2_Type& parameter2(const Derived& section, NodeId id) {
-      return section.parameterV(id);
-    }
-    static H_22_BlockType H_22_Block(Derived& section, int uid) {
-      return section.hessianVBlockByUID(uid);
-    }
-    static B_2_SegmentType b_2_Segment(Derived& section, int par_id) {
-      return section.bVVectorSegment(par_id);
-    }
+    static const Parameter_2_Type &parameter2(const Derived &section, NodeId id) { return section.parameterV(id); }
+    static H_22_BlockType H_22_Block(Derived &section, int uid) { return section.hessianVBlockByUID(uid); }
+    static B_2_SegmentType b_2_Segment(Derived &section, int par_id) { return section.bVVectorSegment(par_id); }
 
-    static std::vector<std::map<int, ListWithCount>>& edgeSetterComputer2(Derived& section) {
+    static std::vector<std::map<int, ListWithCount>> &edgeSetterComputer2(Derived &section) {
       return section._edgeSetterComputerV;
     }
   };
@@ -462,11 +370,9 @@ public:
 
     using H_12_BlockType = typename Hessian::MatTraitsU::MatrixType::BlockType;
 
-    static H_12_BlockType H_12_Block(Derived& section, int uid) {
-      return section.hessianUBlockByUID(uid);
-    }
+    static H_12_BlockType H_12_Block(Derived &section, int uid) { return section.hessianUBlockByUID(uid); }
 
-    static ListWithCount& edgeSetterComputer12(Derived& section, int i, int j) {
+    static ListWithCount &edgeSetterComputer12(Derived &section, int i, int j) {
       return section._edgeSetterComputerU[j][i];
     }
   };
@@ -474,11 +380,9 @@ public:
 
     using H_12_BlockType = typename Hessian::MatTraitsW::MatrixType::BlockType;
 
-    static H_12_BlockType H_12_Block(Derived& section, int uid) {
-      return section.hessianWBlockByUID(uid);
-    }
+    static H_12_BlockType H_12_Block(Derived &section, int uid) { return section.hessianWBlockByUID(uid); }
 
-    static ListWithCount& edgeSetterComputer12(Derived& section, int i, int j) {
+    static ListWithCount &edgeSetterComputer12(Derived &section, int i, int j) {
       return section._edgeSetterComputerW[i][j];
     }
   };
@@ -486,18 +390,19 @@ public:
 
     using H_12_BlockType = typename Hessian::MatTraitsV::MatrixType::BlockType;
 
-    static H_12_BlockType H_12_Block(Derived& section, int uid) {
-      return section.hessianVBlockByUID(uid);
-    }
+    static H_12_BlockType H_12_Block(Derived &section, int uid) { return section.hessianVBlockByUID(uid); }
 
-    static ListWithCount& edgeSetterComputer12(Derived& section, int i, int j) {
+    static ListWithCount &edgeSetterComputer12(Derived &section, int i, int j) {
       return section._edgeSetterComputerV[j][i];
     }
   };
 
   template <class EdgeBinaryParameter1_T, class EdgeBinaryParameter2_T, class EdgeBinaryHessian12_T>
-  struct EdgeBinaryAdapter : public EdgeBinaryParameter1_T, public EdgeBinaryParameter2_T, public EdgeBinaryHessian12_T {
-    static constexpr bool isEdgeAcrossSections = !EdgeSameSection<Derived, EdgeBinaryParameter1_T, EdgeBinaryParameter2_T>::value;
+  struct EdgeBinaryAdapter : public EdgeBinaryParameter1_T,
+                             public EdgeBinaryParameter2_T,
+                             public EdgeBinaryHessian12_T {
+    static constexpr bool isEdgeAcrossSections =
+        !EdgeSameSection<Derived, EdgeBinaryParameter1_T, EdgeBinaryParameter2_T>::value;
   };
 
   template <class EdgeBinaryAdapterT, class EdgeDerived>
@@ -507,15 +412,12 @@ public:
   using EdgeBinaryAdapterUV = EdgeBinaryAdapter<EdgeBinaryParameter1_U, EdgeBinaryParameter2_V, EdgeBinaryHessian12_UV>;
   using EdgeBinaryAdapterVV = EdgeBinaryAdapter<EdgeBinaryParameter1_V, EdgeBinaryParameter2_V, EdgeBinaryHessian12_VV>;
 
-  template <class EdgeDerived>
-  using EdgeBinaryUU = EdgeBinary<EdgeBinaryAdapterUU, EdgeDerived>;
-  template <class EdgeDerived>
-  using EdgeBinaryUV = EdgeBinary<EdgeBinaryAdapterUV, EdgeDerived>;
-  template <class EdgeDerived>
-  using EdgeBinaryVV = EdgeBinary<EdgeBinaryAdapterVV, EdgeDerived>;
+  template <class EdgeDerived> using EdgeBinaryUU = EdgeBinary<EdgeBinaryAdapterUU, EdgeDerived>;
+  template <class EdgeDerived> using EdgeBinaryUV = EdgeBinary<EdgeBinaryAdapterUV, EdgeDerived>;
+  template <class EdgeDerived> using EdgeBinaryVV = EdgeBinary<EdgeBinaryAdapterVV, EdgeDerived>;
 
   template <class EdgeBinaryAdapterT, class EdgeDerived>
-  void addEdge(NodeId i, NodeId j, EdgeBinary<EdgeBinaryAdapterT, EdgeDerived>* e);
+  void addEdge(NodeId i, NodeId j, EdgeBinary<EdgeBinaryAdapterT, EdgeDerived> *e);
 };
 
 } // namespace csNelson

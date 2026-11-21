@@ -4,21 +4,16 @@
 #include <csNelson/testDoubleSectionSchurCommon_impl.hpp>
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
-class Points2d3dDDFD : public Points2d3dBase<Points2d3dDDFD<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
-                                             csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, numPoints2d, csBlockMatrix::Dynamic> {
+class Points2d3dDDFD
+    : public Points2d3dBase<Points2d3dDDFD<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
+                            csBlockMatrix::Dynamic, csBlockMatrix::Dynamic, numPoints2d, csBlockMatrix::Dynamic> {
 
 public:
-  int parameterUSize(void) const override {
-    return Point2d::blockSize;
-  }
+  int parameterUSize(void) const override { return Point2d::blockSize; }
 
-  int parameterVSize(void) const override {
-    return Point3d::blockSize;
-  }
+  int parameterVSize(void) const override { return Point3d::blockSize; }
 
-  int numParametersV() const override {
-    return numPoints3d;
-  }
+  int numParametersV() const override { return numPoints3d; }
 };
 
 using PointsSectionDDFD_DenseDiagoDense =
@@ -54,12 +49,15 @@ using PointsSectionDDFD_SpacoDiagoSpars =
 using PointsSectionDDFD_SpacoDiagoSpaco =
     Points2d3dDDFD<csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
 
-TEMPLATE_TEST_CASE("DoubleSection-DDFD", "[DoubleSection-DDFD]", PointsSectionDDFD_DenseDiagoDense, PointsSectionDDFD_DenseDiagoDiago,
-                   PointsSectionDDFD_DenseDiagoSpars, PointsSectionDDFD_DenseDiagoSpaco, PointsSectionDDFD_DiagoDiagoDense,
-                   PointsSectionDDFD_DiagoDiagoDiago, PointsSectionDDFD_DiagoDiagoSpars, PointsSectionDDFD_DiagoDiagoSpaco,
-                   PointsSectionDDFD_SparsDiagoDense, PointsSectionDDFD_SparsDiagoDiago, PointsSectionDDFD_SparsDiagoSpars,
-                   PointsSectionDDFD_SparsDiagoSpaco, PointsSectionDDFD_SpacoDiagoDense, PointsSectionDDFD_SpacoDiagoDiago,
-                   PointsSectionDDFD_SpacoDiagoSpars, PointsSectionDDFD_SpacoDiagoSpaco) {
+TEMPLATE_TEST_CASE("DoubleSection-DDFD", "[DoubleSection-DDFD]", PointsSectionDDFD_DenseDiagoDense,
+                   PointsSectionDDFD_DenseDiagoDiago, PointsSectionDDFD_DenseDiagoSpars,
+                   PointsSectionDDFD_DenseDiagoSpaco, PointsSectionDDFD_DiagoDiagoDense,
+                   PointsSectionDDFD_DiagoDiagoDiago, PointsSectionDDFD_DiagoDiagoSpars,
+                   PointsSectionDDFD_DiagoDiagoSpaco, PointsSectionDDFD_SparsDiagoDense,
+                   PointsSectionDDFD_SparsDiagoDiago, PointsSectionDDFD_SparsDiagoSpars,
+                   PointsSectionDDFD_SparsDiagoSpaco, PointsSectionDDFD_SpacoDiagoDense,
+                   PointsSectionDDFD_SpacoDiagoDiago, PointsSectionDDFD_SpacoDiagoSpars,
+                   PointsSectionDDFD_SpacoDiagoSpaco) {
 
   testFunction<TestType, csNelson::GaussNewton>();
   testFunction<TestType, csNelson::LevenbergMarquardt>();

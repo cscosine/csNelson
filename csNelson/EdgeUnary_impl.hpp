@@ -5,11 +5,8 @@
 namespace csNelson {
 
 template <class Section>
-EdgeUnarySectionBase<Section>::EdgeUnarySectionBase()
-    : EdgeUnaryBase()
-    , EdgeSectionBase<Section>() {}
+EdgeUnarySectionBase<Section>::EdgeUnarySectionBase() : EdgeUnaryBase(), EdgeSectionBase<Section>() {}
 
-template <class Section>
-EdgeUnarySectionBase<Section>::~EdgeUnarySectionBase() {}
+template <class Section> EdgeUnarySectionBase<Section>::~EdgeUnarySectionBase() {}
 
 } // namespace csNelson

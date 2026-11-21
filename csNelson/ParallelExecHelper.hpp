@@ -14,56 +14,34 @@ class ParallelExecSettings {
 
 public:
   ParallelExecSettings()
-      : _maxNumThreads(1)
-      , _chunkSize(0)
-      , // auto
-      _schedule(ParallelSchedule::schedule_static) {}
+      : _maxNumThreads(1), _chunkSize(0), // auto
+        _schedule(ParallelSchedule::schedule_static) {}
 
-  int maxNumThreads() const {
-    return _maxNumThreads;
-  }
+  int maxNumThreads() const { return _maxNumThreads; }
 
-  bool isSingleThread() const {
-    return _maxNumThreads == 1;
-  }
-  bool isMultiThread() const {
-    return _maxNumThreads != 1;
-  }
+  bool isSingleThread() const { return _maxNumThreads == 1; }
+  bool isMultiThread() const { return _maxNumThreads != 1; }
 
-  int chunkSize() const {
-    return _chunkSize;
-  }
-  bool isChunkAuto() const {
-    return _chunkSize == 0;
-  }
+  int chunkSize() const { return _chunkSize; }
+  bool isChunkAuto() const { return _chunkSize == 0; }
 
-  ParallelSchedule schedule() const {
-    return _schedule;
-  }
+  ParallelSchedule schedule() const { return _schedule; }
 
   void setNumThreads(int n) {
     assert(n >= 1);
     _maxNumThreads = n;
   }
-  void setSingleThread() {
-    _maxNumThreads = 1;
-  }
-  void setNumThreadsMax() {
-    _maxNumThreads = maxSupportedThreads();
-  }
+  void setSingleThread() { _maxNumThreads = 1; }
+  void setNumThreadsMax() { _maxNumThreads = maxSupportedThreads(); }
 
-  static int maxSupportedThreads() {
-    return csCore::core::ompMaxThreads();
-  }
+  static int maxSupportedThreads() { return csCore::core::ompMaxThreads(); }
 
   void setChunkSize(int c) {
     assert(c >= 0);
     _chunkSize = c;
   }
 
-  void setChunkAuto() {
-    _chunkSize = 0;
-  }
+  void setChunkAuto() { _chunkSize = 0; }
 };
 
 } // namespace csNelson

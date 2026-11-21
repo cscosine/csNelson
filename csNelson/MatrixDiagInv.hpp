@@ -13,13 +13,14 @@ struct MatrixDiagInvSettings {
   ParallelExecSettings rightVectorMult;
 };
 
-template <int matType, class T, int BV, int NBV, int matTypeOut>
-class MatrixDiagInv {
+template <int matType, class T, int BV, int NBV, int matTypeOut> class MatrixDiagInv {
 public:
-  using MatTraitsV = csBlockMatrix::MatrixBlockIterableTypeTraits<matType, T, csBlockMatrix::ColMajor, BV, BV, NBV, NBV>;
+  using MatTraitsV =
+      csBlockMatrix::MatrixBlockIterableTypeTraits<matType, T, csBlockMatrix::ColMajor, BV, BV, NBV, NBV>;
   using MatTypeV = typename MatTraitsV::MatrixType;
 
-  using MatTraitsVinv = csBlockMatrix::MatrixBlockIterableTypeTraits<matTypeOut, T, csBlockMatrix::ColMajor, BV, BV, NBV, NBV>;
+  using MatTraitsVinv =
+      csBlockMatrix::MatrixBlockIterableTypeTraits<matTypeOut, T, csBlockMatrix::ColMajor, BV, BV, NBV, NBV>;
   using MatTypeVinv = typename MatTraitsVinv::MatrixType;
 
 private:
@@ -28,21 +29,16 @@ private:
   MatrixDiagInvSettings _settings;
 
 public:
-  const MatrixDiagInvSettings& settings() const {
-    return _settings;
-  }
-  MatrixDiagInvSettings& settings() {
-    return _settings;
-  }
+  const MatrixDiagInvSettings &settings() const { return _settings; }
+  MatrixDiagInvSettings &settings() { return _settings; }
 
-  void init(const MatTypeV& V);
-  void compute(const MatTypeV& V, T relLambda, T absLambda);
+  void init(const MatTypeV &V);
+  void compute(const MatTypeV &V, T relLambda, T absLambda);
 
-  MatTypeVinv& Vinv() {
-    return _Vinv;
-  }
+  MatTypeVinv &Vinv() { return _Vinv; }
 
-  void rightMultVector(const csBlockMatrix::VectorBlock<T, BV, NBV>& v, csBlockMatrix::VectorBlock<T, BV, NBV>& res) const;
+  void rightMultVector(const csBlockMatrix::VectorBlock<T, BV, NBV> &v,
+                       csBlockMatrix::VectorBlock<T, BV, NBV> &res) const;
 };
 
 } // namespace csNelson

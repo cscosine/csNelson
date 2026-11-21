@@ -22,7 +22,7 @@ template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
 DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
+void DenseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType *matrix) {
   this->_matrix = matrix;
   this->_matCopy.resize(this->_matrix->blockDescriptor());
   this->_matCopy.setZero();
@@ -44,7 +44,7 @@ template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
 DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::~DenseWrapper() {}
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
+void DenseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType *matrix) {
   this->_matrix = matrix;
   this->_matCopy.resize(this->_matrix->blockDescriptor());
   this->_matCopy.setZero();
@@ -81,14 +81,14 @@ T DenseSquareWrapper<matType, T, Ordering, BR, NBR>::maxAbsDiag() const {
 
 template <int matType, class T, int Ordering, int BR, int NBR>
 template <class Derived>
-void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived>& dest) const {
+void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived> &dest) const {
   assert(dest.size() == this->mat().diagonal().size());
   dest = this->mat().diagonal();
 }
 
 template <int matType, class T, int Ordering, int BR, int NBR>
 template <class Derived>
-void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived>& values) {
+void DenseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived> &values) {
   this->mat().diagonal() = values;
 }
 

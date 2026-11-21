@@ -9,21 +9,16 @@
 
 namespace csNelson {
 
-template <class Solver>
-GaussNewton<Solver>::GaussNewton()
-    : iter(-1) {}
+template <class Solver> GaussNewton<Solver>::GaussNewton() : iter(-1) {}
 
 template <class Solver>
-GaussNewton<Solver>::GaussNewton(const GaussNewtonSettings& settings)
-    : _settings(settings)
-    , iter(-1) {}
+GaussNewton<Solver>::GaussNewton(const GaussNewtonSettings &settings) : _settings(settings), iter(-1) {}
 
-template <class Solver>
-GaussNewton<Solver>::~GaussNewton() {}
+template <class Solver> GaussNewton<Solver>::~GaussNewton() {}
 
 template <class Solver>
 template <class OptimizationProblem>
-GaussNewtonTerminationReason GaussNewton<Solver>::solve(OptimizationProblem& op) {
+GaussNewtonTerminationReason GaussNewton<Solver>::solve(OptimizationProblem &op) {
 
   _stats.reserve(_settings.maxNumIt);
   _timingStats.reserve(_settings.maxNumIt);

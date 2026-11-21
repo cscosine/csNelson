@@ -7,7 +7,7 @@ struct Problem {
   int nPoints;
   std::vector<std::pair<int, int>> edges;
 
-  bool load(const std::string& file);
+  bool load(const std::string &file);
 
   std::string toString() const;
 };

@@ -5,7 +5,7 @@
 #include <iomanip>
 #include <sstream>
 
-bool Problem::load(const std::string& file) {
+bool Problem::load(const std::string &file) {
   bool ok = true;
   std::ifstream f;
   f.open(file);

@@ -9,23 +9,17 @@
 
 namespace csNelson {
 
-template <class Solver>
-LevenbergMarquardt<Solver>::LevenbergMarquardt()
-    : iter(-1)
-    , subiter(-1) {}
+template <class Solver> LevenbergMarquardt<Solver>::LevenbergMarquardt() : iter(-1), subiter(-1) {}
 
 template <class Solver>
-LevenbergMarquardt<Solver>::LevenbergMarquardt(const LevenbergMarquardtSettings& settings)
-    : _settings(settings)
-    , iter(-1)
-    , subiter(-1) {}
+LevenbergMarquardt<Solver>::LevenbergMarquardt(const LevenbergMarquardtSettings &settings)
+    : _settings(settings), iter(-1), subiter(-1) {}
 
-template <class Solver>
-LevenbergMarquardt<Solver>::~LevenbergMarquardt() {}
+template <class Solver> LevenbergMarquardt<Solver>::~LevenbergMarquardt() {}
 
 template <class Solver>
 template <class OptimizationProblem>
-LevenbergMarquardtTerminationReason LevenbergMarquardt<Solver>::solve(OptimizationProblem& op) {
+LevenbergMarquardtTerminationReason LevenbergMarquardt<Solver>::solve(OptimizationProblem &op) {
 
   _stats.reserve(_settings.maxNumIt, _settings.maxNumSubIt);
 

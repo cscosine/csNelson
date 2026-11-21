@@ -1,6 +1,6 @@
 #pragma once
-#include <csCore/core/OpenMP.hpp>
 #include <csBlockMatrix/VectorBlock_impl.hpp>
+#include <csCore/core/OpenMP.hpp>
 #include <csNelson/MatrixDiagInv.hpp>
 
 #include <csBlockMatrix/DenseMatrixBlock_impl.hpp>
@@ -16,14 +16,14 @@
 namespace csNelson {
 
 template <int matType, class T, int BV, int NBV, int matTypeOut>
-void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::init(const MatTypeV& V) {
+void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::init(const MatTypeV &V) {
   _Vinv.resize(V.blockDescriptor(), V.sparsityPatternCSPtr());
 }
 
 template <int matType, class T, int BV, int NBV, int matTypeOut>
-void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::compute(const MatTypeV& V, T relLambda, T absLambda) {
+void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::compute(const MatTypeV &V, T relLambda, T absLambda) {
 
-  const auto& settings = _settings.blockInversion;
+  const auto &settings = _settings.blockInversion;
   const int chunkSize = settings.chunkSize();
   const int numEval = int(V.numBlocksCol());
   const int reqNumThread = std::min(numEval, settings.maxNumThreads());
@@ -43,7 +43,7 @@ void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::compute(const MatTypeV& V, 
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -54,7 +54,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
           _Vinv.blockByUID(c) = _Vinv.blockByUID(c).inverse().eval();
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -67,7 +67,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, c
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -78,7 +78,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
           _Vinv.blockByUID(c) = _Vinv.blockByUID(c).inverse().eval();
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -91,7 +91,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, 
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -102,7 +102,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
           _Vinv.blockByUID(c) = _Vinv.blockByUID(c).inverse().eval();
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int c = 0; c < V.numBlocksCol(); c++) {
           assert(_Vinv.blockUID(c, c) == c);
           _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -114,7 +114,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, c
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
+      CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int c = 0; c < V.numBlocksCol(); c++) {
         assert(_Vinv.blockUID(c, c) == c);
         _Vinv.blockByUID(c) = V.blockByUID(c).template selfadjointView<Eigen::Upper>();
@@ -129,10 +129,10 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
 }
 
 template <int matType, class T, int BV, int NBV, int matTypeOut>
-void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::rightMultVector(const csBlockMatrix::VectorBlock<T, BV, NBV>& v,
-                                                                     csBlockMatrix::VectorBlock<T, BV, NBV>& res) const {
+void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::rightMultVector(
+    const csBlockMatrix::VectorBlock<T, BV, NBV> &v, csBlockMatrix::VectorBlock<T, BV, NBV> &res) const {
 
-  const auto& settings = _settings.rightVectorMult;
+  const auto &settings = _settings.rightVectorMult;
   const int chunkSize = settings.chunkSize();
   const int numEval = int(_Vinv.numBlocksCol());
   const int reqNumThread = std::min(numEval, settings.maxNumThreads());
@@ -149,42 +149,42 @@ void MatrixDiagInv<matType, T, BV, NBV, matTypeOut>::rightMultVector(const csBlo
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
           res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
+      CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int c = 0; c < _Vinv.numBlocksCol(); c++) {
         res.segment(c) = _Vinv.blockByUID(c) * v.segment(c);
       }

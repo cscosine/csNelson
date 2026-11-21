@@ -77,7 +77,7 @@ public:
     std::chrono::duration<double> computeIncrementTime;
     std::chrono::duration<double> overallTime;
     IterationTime();
-    std::string toString(const std::string& linePrefix = "") const;
+    std::string toString(const std::string &linePrefix = "") const;
   };
 
 private:
@@ -91,22 +91,17 @@ public:
 
   void reserve(int n);
 
-  void setFirstEvalTime(const std::chrono::duration<double>& d) {
-    _firstEvalTime = d;
-  };
-  void setSolverInitTime(const std::chrono::duration<double>& d) {
-    _solverInitTime = d;
-  }
+  void setFirstEvalTime(const std::chrono::duration<double> &d) { _firstEvalTime = d; };
+  void setSolverInitTime(const std::chrono::duration<double> &d) { _solverInitTime = d; }
 
-  void addIteration(const IterationTime& it);
+  void addIteration(const IterationTime &it);
 
-  std::string toString(const std::string& linePrefix = "") const;
+  std::string toString(const std::string &linePrefix = "") const;
 };
 
 //------------------------------------------------------------------------------------------------------
 
-template <class Solver>
-class GaussNewton {
+template <class Solver> class GaussNewton {
 
   Solver _solver;
 
@@ -123,43 +118,30 @@ public:
   using TimingStats = GaussNewtownTimingStats;
 
   GaussNewton();
-  GaussNewton(const GaussNewtonSettings& settings);
+  GaussNewton(const GaussNewtonSettings &settings);
   virtual ~GaussNewton();
 
-  GaussNewtonSettings& settings() {
-    return _settings;
-  }
-  const GaussNewtonSettings& settings() const {
-    return _settings;
-  }
+  GaussNewtonSettings &settings() { return _settings; }
+  const GaussNewtonSettings &settings() const { return _settings; }
 
-  template <typename RetType = typename Solver::Settings&>
+  template <typename RetType = typename Solver::Settings &>
   inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() {
     return _solver.settings();
   }
 
-  template <typename RetType = const typename Solver::Settings&>
+  template <typename RetType = const typename Solver::Settings &>
   inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() const {
     return _solver.settings();
   }
 
-  const GaussNewtownStats stats() const {
-    return _stats;
-  }
-  const GaussNewtownTimingStats timingStats() const {
-    return _timingStats;
-  }
+  const GaussNewtownStats stats() const { return _stats; }
+  const GaussNewtownTimingStats timingStats() const { return _timingStats; }
 
-  const Solver& solver() const {
-    return _solver;
-  }
+  const Solver &solver() const { return _solver; }
 
-  template <class OptimizationProblem>
-  GaussNewtonTerminationReason solve(OptimizationProblem& op);
+  template <class OptimizationProblem> GaussNewtonTerminationReason solve(OptimizationProblem &op);
 
-  int numIterations() const {
-    return iter;
-  }
+  int numIterations() const { return iter; }
 };
 
 } // namespace csNelson
