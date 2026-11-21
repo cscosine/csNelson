@@ -1,8 +1,9 @@
-project(csNelsonTest  LANGUAGES CXX)
+project(csNelsonTest LANGUAGES CXX)
 
 include(CTest)
 
-set(TESTS_LIST
+set(
+  TESTS_LIST
   testSingleSectionHessian.cpp
   testDoubleSectionHessian.cpp
   testSingleSection.cpp
@@ -17,23 +18,24 @@ set(TESTS_LIST
 )
 
 foreach(s ${TESTS_LIST})
-	get_filename_component(sn "${s}" NAME_WE)
-	cs_add_executable(csNelsonTest${sn})
+  get_filename_component(sn "${s}" NAME_WE)
+  cs_add_executable(csNelsonTest${sn})
   cs_find_package(csNelsonTest${sn} PUBLIC Catch2 3 REQUIRED CONFIG)
   include(Catch)
-	cs_target_sources(csNelsonTest${sn} PRIVATE ${s})
-	cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain )
+  cs_target_sources(csNelsonTest${sn} PRIVATE ${s})
+  cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain)
   catch_discover_tests(csNelsonTest${sn} DISCOVERY_MODE "PRE_TEST")
   cs_install_target(csNelsonTest${sn} COMPONENT csNelsonTest${sn})
 endforeach()
 
 ######################################################################
-OPTION(csNelson_COMPILE_LONG_TESTS "Compile All Tests, including very long compile time ones" ON)
+option(csNelson_COMPILE_LONG_TESTS "Compile All Tests, including very long compile time ones" ON)
 
 if(csNelson_COMPILE_LONG_TESTS)
   set(DOUBLESECTIONTESTCOMMON testDoubleSectionCommon.h testDoubleSectionCommon.hpp)
 
-  set(TESTS_LIST
+  set(
+    TESTS_LIST
     testDoublesectionFFFF.cpp
     testDoublesectionFFFD.cpp
     testDoublesectionFFDF.cpp
@@ -88,19 +90,17 @@ if(csNelson_COMPILE_LONG_TESTS)
     cs_find_package(csNelsonTest${sn} PUBLIC Catch2 3 REQUIRED CONFIG)
     include(Catch)
     cs_target_sources(csNelsonTest${sn} PRIVATE ${s} ${DOUBLESECTIONTESTCOMMON})
-    cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain )
+    cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain)
     catch_discover_tests(csNelsonTest${sn} DISCOVERY_MODE "PRE_TEST")
     cs_install_target(csNelsonTest${sn} COMPONENT csNelsonTest${sn})
   endforeach()
 
-
-#--------------------------------------------------------------------------------------------
-
+  #--------------------------------------------------------------------------------------------
 
   set(DOUBLESECTIONSCHURTESTCOMMON testDoubleSectionSchurCommon.h testDoubleSectionSchurCommon.hpp)
 
-
-  set(TESTS_LIST
+  set(
+    TESTS_LIST
     testDoubleSectionSchurDiagBlockFFFF.cpp
     testDoubleSectionSchurDiagBlockFFFD.cpp
     testDoubleSectionSchurDiagBlockFFDF.cpp
@@ -163,19 +163,16 @@ endif()
 
 ######################################################################
 
-set(TESTS_LIST
-  testGaussNewton2DScansAlign.cpp
-  testGaussNewton2DScansAlignNary.cpp
-)
+set(TESTS_LIST testGaussNewton2DScansAlign.cpp testGaussNewton2DScansAlignNary.cpp)
 
 foreach(s ${TESTS_LIST})
-	get_filename_component(sn "${s}" NAME_WE)
-	cs_add_executable(csNelsonTest${sn})
+  get_filename_component(sn "${s}" NAME_WE)
+  cs_add_executable(csNelsonTest${sn})
   cs_find_package(csNelsonTest${sn} PUBLIC Catch2 3 REQUIRED CONFIG)
   include(Catch)
   cs_find_package(csNelsonTest${sn} PUBLIC csLie COMPONENTS csLie REQUIRED CONFIG)
-	cs_target_sources(csNelsonTest${sn} PRIVATE ${s})
-	cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain csLie::csLie)
+  cs_target_sources(csNelsonTest${sn} PRIVATE ${s})
+  cs_target_link_libraries(csNelsonTest${sn} PRIVATE csNelson::csNelson Catch2::Catch2WithMain csLie::csLie)
   catch_discover_tests(csNelsonTest${sn} DISCOVERY_MODE "PRE_TEST")
   cs_install_target(csNelsonTest${sn} COMPONENT csNelsonTest${sn})
 endforeach()
