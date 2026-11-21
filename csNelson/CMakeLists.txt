@@ -1,6 +1,5 @@
 project(csNelson LANGUAGES CXX)
 
-
 # prepare custom project asserts, note: use standard find_package
 find_package(csCore REQUIRED COMPONENTS assert CONFIG)
 
@@ -8,13 +7,13 @@ list(APPEND CMAKE_MODULE_PATH "${csCore_BASE_DIR}/cmake/csCore/assert/")
 include(csAssert)
 
 # set defaults for Paranoid additional configuration
-csSetAssertDefaultOnForConfig(${PROJECT_NAME} ASSERT RELEASE Paranoid ON)
-csSetAssertDefaultOnForConfig(${PROJECT_NAME} ASSERT RELWITHDEBINFO Paranoid ON)
-csSetAssertDefaultOnForConfig(${PROJECT_NAME} ASSERT DEBUG Paranoid ON)
-csSetAssertDefaultOnForConfig(${PROJECT_NAME} ASSERT PARANOID Paranoid ON)
-csSetAssertDefaultOnForConfig(${PROJECT_NAME} ASSERT SAFE_MATH Paranoid ON)
+cssetassertdefaultonforconfig(${PROJECT_NAME} ASSERT RELEASE Paranoid ON)
+cssetassertdefaultonforconfig(${PROJECT_NAME} ASSERT RELWITHDEBINFO Paranoid ON)
+cssetassertdefaultonforconfig(${PROJECT_NAME} ASSERT DEBUG Paranoid ON)
+cssetassertdefaultonforconfig(${PROJECT_NAME} ASSERT PARANOID Paranoid ON)
+cssetassertdefaultonforconfig(${PROJECT_NAME} ASSERT SAFE_MATH Paranoid ON)
 
-csAssertGenerateProject(csNelson csNelson) #generate target csNelson::csNelsonAssert
+cs_assert_generate_project(csNelson csNelson) #generate target csNelson::csNelsonAssert
 list(POP_BACK CMAKE_MODULE_PATH)
 
 # prepare standard library
@@ -29,8 +28,9 @@ cs_find_package(csNelson PUBLIC csBlockMatrix COMPONENTS csBlockMatrix REQUIRED)
 # add openmp support, this will both find the right packages and add link libraries
 cs_target_use_openmp(csNelson PUBLIC)
 
-cs_target_sources(csNelson
-	PRIVATE_INSTALL
+cs_target_sources(
+  csNelson
+  PRIVATE_INSTALL
     Global.hpp
     BaseSection.hpp
     SingleSectionHessian.hpp
@@ -83,7 +83,7 @@ cs_target_sources(csNelson
     LevenbergMarquardt.hpp
     LevenbergMarquardt_impl.hpp
     OrderingTraits.hpp
-	PRIVATE
+  PRIVATE
     BaseSection.cpp
     EdgeInterface.cpp
     EdgeUnary.cpp
@@ -95,14 +95,15 @@ cs_target_sources(csNelson
     LevenbergMarquardt.cpp
 )
 
-cs_target_link_libraries(csNelson
-	PUBLIC
-		Eigen3::Eigen
-    	csCore::core
-      csBlockMatrix::csBlockMatrix
-		csCore::eigenUtils
-		csNelson::csNelsonAssert
-		csNelson::cscmake_base_include
+cs_target_link_libraries(
+  csNelson
+  PUBLIC
+    Eigen3::Eigen
+    csCore::core
+    csBlockMatrix::csBlockMatrix
+    csCore::eigenUtils
+    csNelson::csNelsonAssert
+    csNelson::cscmake_base_include
 )
 
 # TODO(sc) re-enable tests

@@ -5,19 +5,15 @@ project(csNelsonSamples LANGUAGES CXX)
 cs_add_library(csNelsonSamplesProblem STATIC)
 cs_add_library(csNelsonSamplesProblem::csNelsonSamplesProblem ALIAS csNelsonSamplesProblem)
 
-cs_target_sources(csNelsonSamplesProblem
-	PRIVATE_INSTALL
-    Problems.hpp
-	PRIVATE
-    Problems.cpp
-)
+cs_target_sources(csNelsonSamplesProblem PRIVATE_INSTALL Problems.hpp PRIVATE Problems.cpp)
 cs_target_link_libraries(csNelsonSamplesProblem PUBLIC csNelson::cscmake_base_include)
 
 cs_install_target(csNelsonSamplesProblem COMPONENT csNelsonSamplesProblem DEFAULT)
 
 #---------------------------------------------------------------
 # prepare a set of samples dependent on the above library
-set(SAMPLES_LIST
+set(
+  SAMPLES_LIST
   WWtMultPerformances.cpp
   WtXMultPerformances.cpp
   WVinvMultPerformances.cpp
@@ -26,40 +22,41 @@ set(SAMPLES_LIST
 )
 
 foreach(s ${SAMPLES_LIST})
-	get_filename_component(sn "${s}" NAME_WE)
-	cs_add_executable(csNelsonSamples${sn})
-	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
-	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem)
-	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
+  get_filename_component(sn "${s}" NAME_WE)
+  cs_add_executable(csNelsonSamples${sn})
+  cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
+  cs_target_link_libraries(
+    csNelsonSamples${sn}
+    PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem
+  )
+  cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()
-
 
 #---------------------------------------------------------------
 # prepare a second set of samples, with some additional dependencies from real problems (lie and camera)
-set(SAMPLES_LIST
-  BASchurPerfomances.cpp
-)
+set(SAMPLES_LIST BASchurPerfomances.cpp)
 
 foreach(s ${SAMPLES_LIST})
-	get_filename_component(sn "${s}" NAME_WE)
-	cs_add_executable(csNelsonSamples${sn})
-	cs_find_package(csNelsonSamples${sn} PUBLIC csLie COMPONENTS csLie REQUIRED)
-	cs_find_package(csNelsonSamples${sn} PUBLIC csCamera COMPONENTS csCamera REQUIRED)
-	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
-	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem csLie::csLie csCamera::csCamera)
-	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
+  get_filename_component(sn "${s}" NAME_WE)
+  cs_add_executable(csNelsonSamples${sn})
+  cs_find_package(csNelsonSamples${sn} PUBLIC csLie COMPONENTS csLie REQUIRED)
+  cs_find_package(csNelsonSamples${sn} PUBLIC csCamera COMPONENTS csCamera REQUIRED)
+  cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
+  cs_target_link_libraries(
+    csNelsonSamples${sn}
+    PRIVATE csNelson::csNelson csNelsonSamplesProblem::csNelsonSamplesProblem csLie::csLie csCamera::csCamera
+  )
+  cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()
 
 #---------------------------------------------------------------
 # prepare a set of independent samples
-set(SAMPLES_LIST
-  nelsonPlayground.cpp
-)
+set(SAMPLES_LIST nelsonPlayground.cpp)
 
 foreach(s ${SAMPLES_LIST})
-	get_filename_component(sn "${s}" NAME_WE)
-	cs_add_executable(csNelsonSamples${sn})
-	cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
-	cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson)
-	cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
+  get_filename_component(sn "${s}" NAME_WE)
+  cs_add_executable(csNelsonSamples${sn})
+  cs_target_sources(csNelsonSamples${sn} PRIVATE ${s})
+  cs_target_link_libraries(csNelsonSamples${sn} PRIVATE csNelson::csNelson)
+  cs_install_target(csNelsonSamples${sn} COMPONENT csNelsonSamples${sn})
 endforeach()
