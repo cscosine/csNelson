@@ -16,9 +16,9 @@ constexpr int NBCv = 5;
 
 #define DEBUGOUT if (false)
 
-template <int matType, int BC, int NBC>
-void templateTestFunc() {
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matType, double, csBlockMatrix::ColMajor, BC, BC, NBC, NBC>::MatrixType V;
+template <int matType, int BC, int NBC> void templateTestFunc() {
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matType, double, csBlockMatrix::ColMajor, BC, BC, NBC,
+                                                        NBC>::MatrixType V;
   csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::SPtr spV(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>(NBCv, NBCv));
   spV->setDiagonal();
@@ -61,8 +61,9 @@ void templateTestFunc() {
   REQUIRE(ok);
 }
 
-TEMPLATE_TEST_CASE_SIG("MatrixVinvMultiplier", "[MatrixVinvMultiplier]", ((int matType, int BC, int NBC), matType, BC, NBC),
-                       (csBlockMatrix::BlockDiagonal, BCv, NBCv), (csBlockMatrix::BlockDiagonal, BCv, csBlockMatrix::Dynamic),
+TEMPLATE_TEST_CASE_SIG("MatrixVinvMultiplier", "[MatrixVinvMultiplier]",
+                       ((int matType, int BC, int NBC), matType, BC, NBC), (csBlockMatrix::BlockDiagonal, BCv, NBCv),
+                       (csBlockMatrix::BlockDiagonal, BCv, csBlockMatrix::Dynamic),
                        (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, NBCv),
                        (csBlockMatrix::BlockDiagonal, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic),
                        (csBlockMatrix::SparseCoeffBlockDiagonal, BCv, NBCv),

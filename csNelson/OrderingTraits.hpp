@@ -9,21 +9,17 @@ constexpr int choleskyNaturalOrdering = 0;
 constexpr int choleskyAMDOrdering = 1;
 constexpr int choleskyCOLAMDOrdering = 2;
 
-template <int Ordering>
-struct CholeskyOrderingTraits {};
+template <int Ordering> struct CholeskyOrderingTraits {};
 
-template <>
-struct CholeskyOrderingTraits<choleskyNaturalOrdering> {
+template <> struct CholeskyOrderingTraits<choleskyNaturalOrdering> {
   using Ordering = Eigen::NaturalOrdering<int>;
 };
 
-template <>
-struct CholeskyOrderingTraits<choleskyAMDOrdering> {
+template <> struct CholeskyOrderingTraits<choleskyAMDOrdering> {
   using Ordering = Eigen::AMDOrdering<int>;
 };
 
-template <>
-struct CholeskyOrderingTraits<choleskyCOLAMDOrdering> {
+template <> struct CholeskyOrderingTraits<choleskyCOLAMDOrdering> {
   using Ordering = Eigen::COLAMDOrdering<int>;
 };
 

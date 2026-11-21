@@ -4,25 +4,19 @@
 #include <csNelson/testDoubleSectionSchurCommon_impl.hpp>
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
-class Points2d3dDVDF : public Points2d3dBase<Points2d3dDVDF<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
-                                             csBlockMatrix::Dynamic, csBlockMatrix::Variable, csBlockMatrix::Dynamic, numPoints3d> {
+class Points2d3dDVDF
+    : public Points2d3dBase<Points2d3dDVDF<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
+                            csBlockMatrix::Dynamic, csBlockMatrix::Variable, csBlockMatrix::Dynamic, numPoints3d> {
   std::vector<int> v_sizes;
 
 public:
-  Points2d3dDVDF()
-      : v_sizes(numPoints3d, Point3d::blockSize) {}
+  Points2d3dDVDF() : v_sizes(numPoints3d, Point3d::blockSize) {}
 
-  int parameterUSize(void) const override {
-    return Point2d::blockSize;
-  }
+  int parameterUSize(void) const override { return Point2d::blockSize; }
 
-  const std::vector<int>& parameterVSize(void) const override {
-    return v_sizes;
-  }
+  const std::vector<int> &parameterVSize(void) const override { return v_sizes; }
 
-  int numParametersU() const override {
-    return numPoints2d;
-  }
+  int numParametersU() const override { return numPoints2d; }
 };
 
 using PointsSectionDVDF_DenseDiagoDense =
@@ -58,12 +52,15 @@ using PointsSectionDVDF_SpacoDiagoSpars =
 using PointsSectionDVDF_SpacoDiagoSpaco =
     Points2d3dDVDF<csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
 
-TEMPLATE_TEST_CASE("DoubleSection-DVDF", "[DoubleSection-DVDF]", PointsSectionDVDF_DenseDiagoDense, PointsSectionDVDF_DenseDiagoDiago,
-                   PointsSectionDVDF_DenseDiagoSpars, PointsSectionDVDF_DenseDiagoSpaco, PointsSectionDVDF_DiagoDiagoDense,
-                   PointsSectionDVDF_DiagoDiagoDiago, PointsSectionDVDF_DiagoDiagoSpars, PointsSectionDVDF_DiagoDiagoSpaco,
-                   PointsSectionDVDF_SparsDiagoDense, PointsSectionDVDF_SparsDiagoDiago, PointsSectionDVDF_SparsDiagoSpars,
-                   PointsSectionDVDF_SparsDiagoSpaco, PointsSectionDVDF_SpacoDiagoDense, PointsSectionDVDF_SpacoDiagoDiago,
-                   PointsSectionDVDF_SpacoDiagoSpars, PointsSectionDVDF_SpacoDiagoSpaco) {
+TEMPLATE_TEST_CASE("DoubleSection-DVDF", "[DoubleSection-DVDF]", PointsSectionDVDF_DenseDiagoDense,
+                   PointsSectionDVDF_DenseDiagoDiago, PointsSectionDVDF_DenseDiagoSpars,
+                   PointsSectionDVDF_DenseDiagoSpaco, PointsSectionDVDF_DiagoDiagoDense,
+                   PointsSectionDVDF_DiagoDiagoDiago, PointsSectionDVDF_DiagoDiagoSpars,
+                   PointsSectionDVDF_DiagoDiagoSpaco, PointsSectionDVDF_SparsDiagoDense,
+                   PointsSectionDVDF_SparsDiagoDiago, PointsSectionDVDF_SparsDiagoSpars,
+                   PointsSectionDVDF_SparsDiagoSpaco, PointsSectionDVDF_SpacoDiagoDense,
+                   PointsSectionDVDF_SpacoDiagoDiago, PointsSectionDVDF_SpacoDiagoSpars,
+                   PointsSectionDVDF_SpacoDiagoSpaco) {
 
   testFunction<TestType, csNelson::GaussNewton>();
   testFunction<TestType, csNelson::LevenbergMarquardt>();

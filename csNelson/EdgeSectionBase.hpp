@@ -5,15 +5,14 @@
 
 namespace csNelson {
 
-template <class Section>
-class EdgeSectionBase {
+template <class Section> class EdgeSectionBase {
 
-  Section* _section;
+  Section *_section;
 
 protected:
-  void setSection(Section* section);
+  void setSection(Section *section);
 
-  Section& section() {
+  Section &section() {
     assert(_section != nullptr);
     return *_section;
   }
@@ -22,7 +21,7 @@ public:
   EdgeSectionBase();
   virtual ~EdgeSectionBase();
 
-  const Section& section() const {
+  const Section &section() const {
     assert(_section != nullptr);
     return *_section;
   }

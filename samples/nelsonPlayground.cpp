@@ -2,13 +2,13 @@
 #include <csNelson/SingleSectionHessian_impl.hpp>
 
 #include <atomic>
-#include <iostream>
 #include <csCore/core/OpenMP.hpp>
+#include <iostream>
 #include <thread>
 #include <vector>
 
-double parForInner(int id, const std::vector<double>& v1, const std::vector<double>& v2);
-double parForOuter(const std::vector<std::vector<double>>& v1, const std::vector<std::vector<double>>& v2);
+double parForInner(int id, const std::vector<double> &v1, const std::vector<double> &v2);
+double parForOuter(const std::vector<std::vector<double>> &v1, const std::vector<std::vector<double>> &v2);
 void testSparseDenseCombinations();
 
 void testSparseDenseCombinations() {
@@ -39,20 +39,20 @@ void testSparseDenseCombinations() {
   }
 }
 
-double parForOuter(const std::vector<std::vector<double>>& v1, const std::vector<std::vector<double>>& v2) {
+double parForOuter(const std::vector<std::vector<double>> &v1, const std::vector<std::vector<double>> &v2) {
   double tmp(0);
-CS_OMP(parallel for reduction(+ : tmp) schedule(static))
+  CS_OMP(parallel for reduction(+ : tmp) schedule(static))
   for (int i = 0; i < v1.size(); i++) {
     tmp += parForInner(i, v1[i], v2[i]);
   }
   return tmp;
 }
 
-double parForInner(int id, const std::vector<double>& v1, const std::vector<double>& v2) {
+double parForInner(int id, const std::vector<double> &v1, const std::vector<double> &v2) {
   auto entryId = std::this_thread::get_id();
   std::atomic<bool> parallel(false);
   double tmp(0);
-CS_OMP(parallel for reduction(+ : tmp))
+  CS_OMP(parallel for reduction(+ : tmp))
   for (int i = 0; i < v1.size(); i++) {
     tmp += v1[i] + v2[i];
     if (std::this_thread::get_id() != entryId) {
@@ -68,7 +68,7 @@ CS_OMP(parallel for reduction(+ : tmp))
   return tmp;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
   testSparseDenseCombinations();
 

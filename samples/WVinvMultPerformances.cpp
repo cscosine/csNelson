@@ -13,33 +13,32 @@
 constexpr int BR = 6;
 constexpr int BC = 3;
 
-template <int matVType, int matWType>
-void testFunction(const Problem& problem) {
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC, csBlockMatrix::Dynamic,
-                                                        csBlockMatrix::Dynamic>::MatrixType V;
+template <int matVType, int matWType> void testFunction(const Problem &problem) {
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC,
+                                                        csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>::MatrixType V;
   csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::SPtr spV(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>(problem.nPoints, problem.nPoints));
   spV->setDiagonal();
 
-  V.resize(csBlockMatrix::MatrixBlockDescriptor<BC, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(BC, problem.nPoints, BC,
-                                                                                                        problem.nPoints),
+  V.resize(csBlockMatrix::MatrixBlockDescriptor<BC, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(
+               BC, problem.nPoints, BC, problem.nPoints),
            spV);
   V.setZero();
   for (int bi = 0; bi < V.nonZeroBlocks(); bi++) {
     V.blockByUID(bi).setRandom();
   }
 
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic,
-                                                        csBlockMatrix::Dynamic>::MatrixType W;
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC,
+                                                        csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>::MatrixType W;
   csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::SPtr sp(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>(problem.nCameras, problem.nPoints));
   for (int i = 0; i < problem.edges.size(); i++) {
-    const auto& e = problem.edges[i];
+    const auto &e = problem.edges[i];
     sp->add(e.first, e.second);
   }
 
-  W.resize(csBlockMatrix::MatrixBlockDescriptor<BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(BR, problem.nCameras, BC,
-                                                                                                        problem.nPoints),
+  W.resize(csBlockMatrix::MatrixBlockDescriptor<BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(
+               BR, problem.nCameras, BC, problem.nPoints),
            sp);
   W.setZero();
   for (int bi = 0; bi < W.nonZeroBlocks(); bi++) {
@@ -55,7 +54,8 @@ void testFunction(const Problem& problem) {
   bv.resize(W.blockDescriptor().rowDescriptionCSPtr());
   bv.mat().setRandom();
 
-  csNelson::MatrixWVinvMultiplier<matWType, matVType, double, BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> mwvinv;
+  csNelson::MatrixWVinvMultiplier<matWType, matVType, double, BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>
+      mwvinv;
   const int half_maxthreads = csNelson::ParallelExecSettings::maxSupportedThreads() / 2;
   const int maxthreads = csNelson::ParallelExecSettings::maxSupportedThreads();
 
@@ -88,9 +88,13 @@ void testFunction(const Problem& problem) {
   }
 
   // standard
-  csNelson::SparseWrapper<matVType, double, csBlockMatrix::ColMajor, BC, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> V_Wrap;
+  csNelson::SparseWrapper<matVType, double, csBlockMatrix::ColMajor, BC, BC, csBlockMatrix::Dynamic,
+                          csBlockMatrix::Dynamic>
+      V_Wrap;
   V_Wrap.set(&V);
-  csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> W_Wrap;
+  csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic,
+                          csBlockMatrix::Dynamic>
+      W_Wrap;
   W_Wrap.set(&W);
   Eigen::SparseMatrix<double, csBlockMatrix::RowMajor> WVinv;
   {
@@ -112,13 +116,16 @@ void testFunction(const Problem& problem) {
   }
 
   // checks
-  csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>
+  csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic,
+                          csBlockMatrix::Dynamic>
       WVinv_wrap;
   WVinv_wrap.set(&mwvinv.result());
 
-  Eigen::SparseMatrix<double, csBlockMatrix::RowMajor> diff = (WVinv_wrap.mat() - WVinv).template triangularView<Eigen::Upper>();
+  Eigen::SparseMatrix<double, csBlockMatrix::RowMajor> diff =
+      (WVinv_wrap.mat() - WVinv).template triangularView<Eigen::Upper>();
 
-  std::cout << "Eigen::NumTraits<double>::dummy_precision() " << Eigen::NumTraits<double>::dummy_precision() << std::endl;
+  std::cout << "Eigen::NumTraits<double>::dummy_precision() " << Eigen::NumTraits<double>::dummy_precision()
+            << std::endl;
 
   double maxErr = diff.coeffs().cwiseAbs().maxCoeff();
   bool ok = (diff.coeffs().cwiseAbs() < 16 * Eigen::NumTraits<double>::dummy_precision()).all();
@@ -167,8 +174,8 @@ void testFunction(const Problem& problem) {
   }
 }
 
-int main(int argc, char* argv[]) {
-  const Problem* problemPtr = &ProblemCollections::ladybug_49_7776;
+int main(int argc, char *argv[]) {
+  const Problem *problemPtr = &ProblemCollections::ladybug_49_7776;
   std::unique_ptr<Problem> newProblem;
   if (argc == 2) {
     newProblem.reset(new Problem());
@@ -180,7 +187,7 @@ int main(int argc, char* argv[]) {
       problemPtr = newProblem.get();
     }
   }
-  const Problem& problem = *problemPtr;
+  const Problem &problem = *problemPtr;
 
   std::cout << "--------- V BlockDiagonal, W BlockCoeffSparse" << std::endl;
   testFunction<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>(problem);

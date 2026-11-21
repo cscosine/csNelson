@@ -21,12 +21,12 @@ static constexpr int secSizeFix = 3;
 static constexpr int numBlocks = 10;
 
 template <class Section>
-class EdgeUnaryTest : public csNelson::EdgeUnarySectionBaseCRPT<Section, typename Section::EdgeUnaryAdapter, EdgeUnaryTest<Section>> {
+class EdgeUnaryTest
+    : public csNelson::EdgeUnarySectionBaseCRPT<Section, typename Section::EdgeUnaryAdapter, EdgeUnaryTest<Section>> {
   int _parId;
 
 public:
-  EdgeUnaryTest(int parId)
-      : _parId(parId) {}
+  EdgeUnaryTest(int parId) : _parId(parId) {}
 
   void update(bool hessians) override {
     if (this->parId().isVariable()) {
@@ -36,11 +36,11 @@ public:
       REQUIRE(this->parId().id() == _parId);
     }
 
-    const auto& par = this->parameter();
+    const auto &par = this->parameter();
   }
 
   template <class Derived1, class Derived2>
-  void updateHBlock(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& v) {
+  void updateHBlock(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &v) {
     REQUIRE(this->parId().isVariable());
     std::cout << "EdgeUnaryTest::updateHBlock " << this->parId().id() << "," << this->parId().id() << std::endl;
     H.setConstant(1);
@@ -49,14 +49,12 @@ public:
 };
 
 template <class Section>
-class EdgeBinaryTest
-    : public csNelson::EdgeBinarySectionBaseCRPT<Section, typename Section::EdgeBinaryAdapter, EdgeBinaryTest<Section>> {
+class EdgeBinaryTest : public csNelson::EdgeBinarySectionBaseCRPT<Section, typename Section::EdgeBinaryAdapter,
+                                                                  EdgeBinaryTest<Section>> {
   int _par1Id, _par2Id;
 
 public:
-  EdgeBinaryTest(int par1Id, int par2Id)
-      : _par1Id(par1Id)
-      , _par2Id(par2Id) {}
+  EdgeBinaryTest(int par1Id, int par2Id) : _par1Id(par1Id), _par2Id(par2Id) {}
 
   void update(bool hessians) override {
     REQUIRE(this->par_1_Id().id() == _par1Id);
@@ -71,45 +69,46 @@ public:
       REQUIRE(this->H_22_Uid() >= 0);
     }
 
-    const auto& p1 = this->parameter_1();
-    const auto& p2 = this->parameter_2();
+    const auto &p1 = this->parameter_1();
+    const auto &p2 = this->parameter_2();
   }
 
   template <class Derived1, class Derived2>
-  void updateH11Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& b) {
+  void updateH11Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &b) {
     REQUIRE(this->par_1_Id().isVariable());
-    std::cout << "EdgeBinaryTest::updateHBlock[11] " << this->par_1_Id().id() << "," << this->par_1_Id().id() << std::endl;
+    std::cout << "EdgeBinaryTest::updateHBlock[11] " << this->par_1_Id().id() << "," << this->par_1_Id().id()
+              << std::endl;
     H.setConstant(11);
     b.setConstant(11);
   }
-  template <class Derived>
-  void updateH12Block(Eigen::MatrixBase<Derived>& b, bool transpose) {
+  template <class Derived> void updateH12Block(Eigen::MatrixBase<Derived> &b, bool transpose) {
     assert(transpose == false);
     REQUIRE(this->par_1_Id().isVariable());
     REQUIRE(this->par_2_Id().isVariable());
-    std::cout << "EdgeBinaryTest::updateHBlock[12] " << this->par_1_Id().id() << "," << this->par_2_Id().id() << std::endl;
+    std::cout << "EdgeBinaryTest::updateHBlock[12] " << this->par_1_Id().id() << "," << this->par_2_Id().id()
+              << std::endl;
     b.setConstant(12);
   }
   template <class Derived1, class Derived2>
-  void updateH22Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& b) {
+  void updateH22Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &b) {
     REQUIRE(this->par_2_Id().isVariable());
-    std::cout << "EdgeBinaryTest::updateHBlock[22] " << this->par_2_Id().id() << "," << this->par_2_Id().id() << std::endl;
+    std::cout << "EdgeBinaryTest::updateHBlock[22] " << this->par_2_Id().id() << "," << this->par_2_Id().id()
+              << std::endl;
     H.setConstant(22);
     b.setConstant(22);
   }
 };
 
 template <int matType>
-class PointsSectionFF : public csNelson::SingleSection<PointsSectionFF<matType>, Point, matType, double, secSizeFix, numBlocks> {
+class PointsSectionFF
+    : public csNelson::SingleSection<PointsSectionFF<matType>, Point, matType, double, secSizeFix, numBlocks> {
   std::array<Point, numBlocks> _points;
   Point _fixedPoint;
 
 public:
-  PointsSectionFF() {
-    this->parametersReady();
-  }
+  PointsSectionFF() { this->parametersReady(); }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -117,7 +116,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -126,9 +125,7 @@ public:
     }
   }
 
-  int numFixedParameters() const override {
-    return 1;
-  }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionFF_BlockDense = PointsSectionFF<csBlockMatrix::BlockDense>;
@@ -139,8 +136,8 @@ using PointsSectionFF_BlockCoeffSparse = PointsSectionFF<csBlockMatrix::BlockCoe
 //-----------------------------------------------------------------------------------------------------------------
 
 template <int matType>
-class PointsSectionFD
-    : public csNelson::SingleSection<PointsSectionFD<matType>, Point, matType, double, secSizeFix, csBlockMatrix::Dynamic> {
+class PointsSectionFD : public csNelson::SingleSection<PointsSectionFD<matType>, Point, matType, double, secSizeFix,
+                                                       csBlockMatrix::Dynamic> {
   std::vector<Point> _points;
   Point _fixedPoint;
 
@@ -150,7 +147,7 @@ public:
     this->parametersReady();
   }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -158,7 +155,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -167,13 +164,9 @@ public:
     }
   }
 
-  int numParameters() const override {
-    return _points.size();
-  }
+  int numParameters() const override { return _points.size(); }
 
-  int numFixedParameters() const override {
-    return 1;
-  }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionFD_BlockDense = PointsSectionFD<csBlockMatrix::BlockDense>;
@@ -184,17 +177,15 @@ using PointsSectionFD_BlockCoeffSparse = PointsSectionFD<csBlockMatrix::BlockCoe
 //-----------------------------------------------------------------------------------------------------------------
 
 template <int matType>
-class PointsSectionDF
-    : public csNelson::SingleSection<PointsSectionDF<matType>, Point, matType, double, csBlockMatrix::Dynamic, numBlocks> {
+class PointsSectionDF : public csNelson::SingleSection<PointsSectionDF<matType>, Point, matType, double,
+                                                       csBlockMatrix::Dynamic, numBlocks> {
   std::array<Point, numBlocks> _points;
   Point _fixedPoint;
 
 public:
-  PointsSectionDF() {
-    this->parametersReady();
-  }
+  PointsSectionDF() { this->parametersReady(); }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -202,7 +193,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -211,12 +202,8 @@ public:
     }
   }
 
-  int parameterSize() const override {
-    return secSizeFix;
-  }
-  int numFixedParameters() const override {
-    return 1;
-  }
+  int parameterSize() const override { return secSizeFix; }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionDF_BlockDense = PointsSectionDF<csBlockMatrix::BlockDense>;
@@ -227,8 +214,8 @@ using PointsSectionDF_BlockCoeffSparse = PointsSectionDF<csBlockMatrix::BlockCoe
 //-----------------------------------------------------------------------------------------------------------------
 
 template <int matType>
-class PointsSectionDD : public csNelson::SingleSection<PointsSectionDD<matType>, Point, matType, double, csBlockMatrix::Dynamic,
-                                                       csBlockMatrix::Dynamic> {
+class PointsSectionDD : public csNelson::SingleSection<PointsSectionDD<matType>, Point, matType, double,
+                                                       csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
   std::vector<Point> _points;
   Point _fixedPoint;
 
@@ -238,7 +225,7 @@ public:
     this->parametersReady();
   }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -246,7 +233,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -255,16 +242,10 @@ public:
     }
   }
 
-  int parameterSize() const override {
-    return secSizeFix;
-  }
+  int parameterSize() const override { return secSizeFix; }
 
-  int numParameters() const override {
-    return _points.size();
-  }
-  int numFixedParameters() const override {
-    return 1;
-  }
+  int numParameters() const override { return _points.size(); }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionDD_BlockDense = PointsSectionDD<csBlockMatrix::BlockDense>;
@@ -275,19 +256,16 @@ using PointsSectionDD_BlockCoeffSparse = PointsSectionDD<csBlockMatrix::BlockCoe
 //-----------------------------------------------------------------------------------------------------------------
 
 template <int matType>
-class PointsSectionVF
-    : public csNelson::SingleSection<PointsSectionVF<matType>, Point, matType, double, csBlockMatrix::Variable, numBlocks> {
+class PointsSectionVF : public csNelson::SingleSection<PointsSectionVF<matType>, Point, matType, double,
+                                                       csBlockMatrix::Variable, numBlocks> {
   std::array<Point, numBlocks> _points;
   std::vector<int> _sizes;
   Point _fixedPoint;
 
 public:
-  PointsSectionVF()
-      : _sizes(numBlocks, secSizeFix) {
-    this->parametersReady();
-  }
+  PointsSectionVF() : _sizes(numBlocks, secSizeFix) { this->parametersReady(); }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -295,7 +273,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -304,12 +282,8 @@ public:
     }
   }
 
-  const std::vector<int>& parameterSize() const override {
-    return _sizes;
-  }
-  int numFixedParameters() const override {
-    return 1;
-  }
+  const std::vector<int> &parameterSize() const override { return _sizes; }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionVF_BlockDense = PointsSectionVF<csBlockMatrix::BlockDense>;
@@ -320,20 +294,19 @@ using PointsSectionVF_BlockCoeffSparse = PointsSectionVF<csBlockMatrix::BlockCoe
 //-----------------------------------------------------------------------------------------------------------------
 
 template <int matType>
-class PointsSectionVD : public csNelson::SingleSection<PointsSectionVD<matType>, Point, matType, double, csBlockMatrix::Variable,
-                                                       csBlockMatrix::Dynamic> {
+class PointsSectionVD : public csNelson::SingleSection<PointsSectionVD<matType>, Point, matType, double,
+                                                       csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
   std::vector<Point> _points;
   std::vector<int> _sizes;
   Point _fixedPoint;
 
 public:
-  PointsSectionVD()
-      : _sizes(numBlocks, secSizeFix) {
+  PointsSectionVD() : _sizes(numBlocks, secSizeFix) {
     _points.resize(numBlocks);
     this->parametersReady();
   }
 
-  virtual const Point& parameter(csNelson::NodeId i) const {
+  virtual const Point &parameter(csNelson::NodeId i) const {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -341,7 +314,7 @@ public:
       return _fixedPoint;
     }
   }
-  virtual Point& parameter(csNelson::NodeId i) {
+  virtual Point &parameter(csNelson::NodeId i) {
     if (i.isVariable())
       return _points[i.id()];
     else {
@@ -350,12 +323,8 @@ public:
     }
   }
 
-  const std::vector<int>& parameterSize() const override {
-    return _sizes;
-  }
-  int numFixedParameters() const override {
-    return 1;
-  }
+  const std::vector<int> &parameterSize() const override { return _sizes; }
+  int numFixedParameters() const override { return 1; }
 };
 
 using PointsSectionVD_BlockDense = PointsSectionVD<csBlockMatrix::BlockDense>;

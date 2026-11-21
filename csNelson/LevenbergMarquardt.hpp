@@ -61,10 +61,7 @@ public:
   struct OutStats {
     int it;
     std::vector<InStats> subit;
-    OutStats(int it, int reserveIn)
-        : it(it) {
-      subit.reserve(reserveIn);
-    }
+    OutStats(int it, int reserveIn) : it(it) { subit.reserve(reserveIn); }
   };
 
 private:
@@ -84,8 +81,7 @@ public:
 
 //------------------------------------------------------------------------------------------------------
 
-template <class Solver>
-class LevenbergMarquardt {
+template <class Solver> class LevenbergMarquardt {
 
   Solver _solver;
 
@@ -101,43 +97,30 @@ public:
   using Stats = LevenbergMarquardtStats;
 
   LevenbergMarquardt();
-  LevenbergMarquardt(const LevenbergMarquardtSettings& settings);
+  LevenbergMarquardt(const LevenbergMarquardtSettings &settings);
   virtual ~LevenbergMarquardt();
 
-  LevenbergMarquardtSettings& settings() {
-    return _settings;
-  }
-  const LevenbergMarquardtSettings& settings() const {
-    return _settings;
-  }
+  LevenbergMarquardtSettings &settings() { return _settings; }
+  const LevenbergMarquardtSettings &settings() const { return _settings; }
 
-  template <typename RetType = typename Solver::Settings&>
+  template <typename RetType = typename Solver::Settings &>
   inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() {
     return _solver.settings();
   }
 
-  template <typename RetType = const typename Solver::Settings&>
+  template <typename RetType = const typename Solver::Settings &>
   inline std::enable_if_t<Solver::hasSettings, RetType> solverSettings() const {
     return _solver.settings();
   }
 
-  const Solver& solver() const {
-    return _solver;
-  }
+  const Solver &solver() const { return _solver; }
 
-  const LevenbergMarquardtStats stats() const {
-    return _stats;
-  }
+  const LevenbergMarquardtStats stats() const { return _stats; }
 
-  template <class OptimizationProblem>
-  LevenbergMarquardtTerminationReason solve(OptimizationProblem& op);
+  template <class OptimizationProblem> LevenbergMarquardtTerminationReason solve(OptimizationProblem &op);
 
-  int numIterations() const {
-    return iter;
-  }
-  int numSubIterations() const {
-    return subiter;
-  }
+  int numIterations() const { return iter; }
+  int numSubIterations() const { return subiter; }
 };
 
 } // namespace csNelson

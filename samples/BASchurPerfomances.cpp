@@ -23,24 +23,22 @@
 constexpr int BR = 6;
 constexpr int BC = 3;
 
-template <int matUType, int matVType, int matWType>
-class Edge;
+template <int matUType, int matVType, int matWType> class Edge;
 
 template <int matUType, int matVType, int matWType>
-class BA_Problem : public csNelson::DoubleSection<BA_Problem<matUType, matVType, matWType>, csLie::SE3d, Eigen::Vector3d, matUType,
-                                                  matVType, matWType, double, 6, 3, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
+class BA_Problem
+    : public csNelson::DoubleSection<BA_Problem<matUType, matVType, matWType>, csLie::SE3d, Eigen::Vector3d, matUType,
+                                     matVType, matWType, double, 6, 3, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> {
   csCamera::Camerad _camera;
   std::vector<csLie::SE3d> _poses;
   std::vector<Eigen::Vector3d> _points;
 
-  using DoubleSectionBase = csNelson::DoubleSection<BA_Problem<matUType, matVType, matWType>, csLie::SE3d, Eigen::Vector3d, matUType,
-                                                    matVType, matWType, double, 6, 3, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>;
+  using DoubleSectionBase =
+      csNelson::DoubleSection<BA_Problem<matUType, matVType, matWType>, csLie::SE3d, Eigen::Vector3d, matUType,
+                              matVType, matWType, double, 6, 3, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>;
 
 public:
-  BA_Problem(int nc, int np, int ne)
-      : _poses(nc)
-      , _points(np)
-      , _camera(100, 100, 50, 50, 100, 100) {
+  BA_Problem(int nc, int np, int ne) : _poses(nc), _points(np), _camera(100, 100, 50, 50, 100, 100) {
     const double radius_points = 1;
     for (int i = 0; i < _points.size(); i++) {
       _points[i] = Eigen::Vector3d::Random() * radius_points;
@@ -90,25 +88,15 @@ public:
     }
   }
 
-  const csCamera::Camerad& camera() const {
-    return _camera;
-  }
+  const csCamera::Camerad &camera() const { return _camera; }
 
-  int numFixedParametersU() const override {
-    return 1;
-  }
-  int numFixedParametersV() const override {
-    return 1;
-  }
+  int numFixedParametersU() const override { return 1; }
+  int numFixedParametersV() const override { return 1; }
 
-  const csLie::SE3d& pose(int i) const {
-    return _poses[i];
-  }
-  const Eigen::Vector3d& point(int i) const {
-    return _points[i];
-  }
+  const csLie::SE3d &pose(int i) const { return _poses[i]; }
+  const Eigen::Vector3d &point(int i) const { return _points[i]; }
 
-  virtual const csLie::SE3d& parameterU(csNelson::NodeId i) const override {
+  virtual const csLie::SE3d &parameterU(csNelson::NodeId i) const override {
     if (i.isVariable()) {
       return _poses[i.id() + 1];
     } else {
@@ -116,7 +104,7 @@ public:
       return _poses[i.id()];
     }
   }
-  virtual csLie::SE3d& parameterU(csNelson::NodeId i) override {
+  virtual csLie::SE3d &parameterU(csNelson::NodeId i) override {
     if (i.isVariable()) {
       return _poses[i.id() + 1];
     } else {
@@ -125,7 +113,7 @@ public:
     }
   }
 
-  virtual const Eigen::Vector3d& parameterV(csNelson::NodeId i) const override {
+  virtual const Eigen::Vector3d &parameterV(csNelson::NodeId i) const override {
     if (i.isVariable()) {
       return _points[i.id() + 1];
     } else {
@@ -133,7 +121,7 @@ public:
       return _points[i.id()];
     }
   }
-  virtual Eigen::Vector3d& parameterV(csNelson::NodeId i) override {
+  virtual Eigen::Vector3d &parameterV(csNelson::NodeId i) override {
     if (i.isVariable()) {
       return _points[i.id() + 1];
     } else {
@@ -142,15 +130,11 @@ public:
     }
   }
 
-  int numParametersV() const override {
-    return _points.size() - 1;
-  }
+  int numParametersV() const override { return _points.size() - 1; }
 
-  int numParametersU() const override {
-    return _poses.size() - 1;
-  }
+  int numParametersU() const override { return _poses.size() - 1; }
 
-  void oplus(const typename DoubleSectionBase::HessianVectorsT& inc) {
+  void oplus(const typename DoubleSectionBase::HessianVectorsT &inc) {
     for (int i = 1; i < _points.size(); i++) {
       _points[i] += inc.bV().segment(i - 1);
     }
@@ -161,7 +145,8 @@ public:
 };
 
 template <int matUType, int matVType, int matWType>
-class Edge : public BA_Problem<matUType, matVType, matWType>::template EdgeBinaryUV<Edge<matUType, matVType, matWType>> {
+class Edge
+    : public BA_Problem<matUType, matVType, matWType>::template EdgeBinaryUV<Edge<matUType, matVType, matWType>> {
   Eigen::Vector2d _meas;
 
   Eigen::Vector3d _pC;
@@ -177,12 +162,11 @@ class Edge : public BA_Problem<matUType, matVType, matWType>::template EdgeBinar
   Eigen::Matrix<double, 2, 3> _d_err_d_point;
 
 public:
-  Edge(const Eigen::Vector2d& meas)
-      : _meas(meas) {}
+  Edge(const Eigen::Vector2d &meas) : _meas(meas) {}
 
   void update(bool hessians) override {
-    const auto& pose = this->parameter_1();
-    const auto& point = this->parameter_2();
+    const auto &pose = this->parameter_1();
+    const auto &point = this->parameter_2();
 
     if (hessians) {
       this->_pC = pose * point;
@@ -202,40 +186,39 @@ public:
   }
 
   template <class Derived1, class Derived2>
-  void updateH11Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& v) {
+  void updateH11Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &v) {
     // wrt camera
     H.noalias() += _d_err_d_gamma.transpose() * _d_err_d_gamma;
     v += _d_err_d_gamma.transpose() * _err;
   }
   template <class Derived1, class Derived2>
-  void updateH22Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& v) {
+  void updateH22Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &v) {
     H.noalias() += _d_err_d_point.transpose() * _d_err_d_point;
     v += _d_err_d_point.transpose() * _err;
   }
-  template <class Derived1>
-  void updateH12Block(Eigen::MatrixBase<Derived1>& H, bool transpose) {
+  template <class Derived1> void updateH12Block(Eigen::MatrixBase<Derived1> &H, bool transpose) {
     assert(transpose == false);
     H.noalias() += _d_err_d_gamma.transpose() * _d_err_d_point;
   }
 };
 
 template <int matUType, int matVType, int matWType>
-void testFunction(const Problem& problem, bool AMDOrdering, int numThreads) {
+void testFunction(const Problem &problem, bool AMDOrdering, int numThreads) {
   BA_Problem<matUType, matVType, matWType> ba_problem(problem.nCameras, problem.nPoints, problem.edges.size());
   ba_problem.parametersReady();
   ba_problem.reserveEdges(problem.edges.size());
 
   for (int i = 0; i < problem.edges.size(); i++) {
-    const auto& e = problem.edges[i];
+    const auto &e = problem.edges[i];
     const int e_i = e.first;
     const int e_j = e.second;
-    csNelson::NodeId cam_i =
-        csNelson::NodeId((e_i == 0 ? 0 : e_i - 1), (e_i == 0 ? csNelson::NodeType::Fixed : csNelson::NodeType::Variable));
-    csNelson::NodeId point_i =
-        csNelson::NodeId((e_j == 0 ? 0 : e_j - 1), (e_j == 0 ? csNelson::NodeType::Fixed : csNelson::NodeType::Variable));
+    csNelson::NodeId cam_i = csNelson::NodeId((e_i == 0 ? 0 : e_i - 1),
+                                              (e_i == 0 ? csNelson::NodeType::Fixed : csNelson::NodeType::Variable));
+    csNelson::NodeId point_i = csNelson::NodeId((e_j == 0 ? 0 : e_j - 1),
+                                                (e_j == 0 ? csNelson::NodeType::Fixed : csNelson::NodeType::Variable));
     ba_problem.addEdge(cam_i, point_i,
-                       new Edge<matUType, matVType, matWType>(
-                           ba_problem.camera().points3D_to_image(ba_problem.pose(e.first) * ba_problem.point(e.second))));
+                       new Edge<matUType, matVType, matWType>(ba_problem.camera().points3D_to_image(
+                           ba_problem.pose(e.first) * ba_problem.point(e.second))));
   }
 
   if (AMDOrdering) {
@@ -254,9 +237,10 @@ void testFunction(const Problem& problem, bool AMDOrdering, int numThreads) {
 
   std::cout << "chi2 noise add " << ba_problem.hessian().chi2() << std::endl;
 
-  using SolverAlgorithm = csNelson::GaussNewton<typename csNelson::SolverTraits<
-      csNelson::solverCholeskySchurDiagBlockInverseWWtMult>::Solver<typename BA_Problem<matUType, matVType, matWType>::Hessian::Traits,
-                                                                    csNelson::matrixWrapperSparse, csNelson::choleskyNaturalOrdering>>;
+  using SolverAlgorithm =
+      csNelson::GaussNewton<typename csNelson::SolverTraits<csNelson::solverCholeskySchurDiagBlockInverseWWtMult>::
+                                Solver<typename BA_Problem<matUType, matVType, matWType>::Hessian::Traits,
+                                       csNelson::matrixWrapperSparse, csNelson::choleskyNaturalOrdering>>;
   SolverAlgorithm gn;
 
   ba_problem.settings().edgeEvalParallelSettings.setNumThreads(numThreads);
@@ -280,34 +264,34 @@ void testFunction(const Problem& problem, bool AMDOrdering, int numThreads) {
   std::cout << gn.solver().timingStats().toString() << std::endl;
 }
 
-void test(const Problem& problem, bool amdOrdering, int numThreads) {
+void test(const Problem &problem, bool amdOrdering, int numThreads) {
   std::cout << "----------------------------------------------------" << std::endl
             << "U BlockDiagonal, V BlockDiagonal, W BlockSparse" << std::endl;
-  testFunction<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>(problem, amdOrdering,
-                                                                                                       numThreads);
+  testFunction<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse>(
+      problem, amdOrdering, numThreads);
 
   std::cout << "----------------------------------------------------" << std::endl
             << "U SparseCoeffBlockDiagonal, V SparseCoeffBlockDiagonal, W BlockCoeffSparse" << std::endl;
-  testFunction<csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::BlockCoeffSparse>(
-      problem, amdOrdering, numThreads);
+  testFunction<csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::SparseCoeffBlockDiagonal,
+               csBlockMatrix::BlockCoeffSparse>(problem, amdOrdering, numThreads);
   std::cout << "----------------------------------------------------" << std::endl << std::endl;
 
   std::cout << "----------------------------------------------------" << std::endl
             << "U BlockDiagonal, V BlockDiagonal, W BlockCoeffSparse" << std::endl;
-  testFunction<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>(problem, amdOrdering,
-                                                                                                            numThreads);
+  testFunction<csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>(
+      problem, amdOrdering, numThreads);
   std::cout << "----------------------------------------------------" << std::endl << std::endl;
 
   std::cout << "----------------------------------------------------" << std::endl
             << "U SparseCoeffBlockDiagonal, V SparseCoeffBlockDiagonal, W BlockSparse" << std::endl;
-  testFunction<csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::BlockSparse>(
-      problem, amdOrdering, numThreads);
+  testFunction<csBlockMatrix::SparseCoeffBlockDiagonal, csBlockMatrix::SparseCoeffBlockDiagonal,
+               csBlockMatrix::BlockSparse>(problem, amdOrdering, numThreads);
   std::cout << "----------------------------------------------------" << std::endl << std::endl;
 }
 
-int main(int argc, char* argv[]) {
+int main(int argc, char *argv[]) {
 
-  const Problem* problemPtr = &ProblemCollections::ladybug_49_7776;
+  const Problem *problemPtr = &ProblemCollections::ladybug_49_7776;
   std::unique_ptr<Problem> newProblem;
   if (argc == 2) {
     newProblem.reset(new Problem());
@@ -319,7 +303,7 @@ int main(int argc, char* argv[]) {
       problemPtr = newProblem.get();
     }
   }
-  const Problem& problem = *problemPtr;
+  const Problem &problem = *problemPtr;
 
   // int numThreads = csNelson::ParallelExecSettings::maxSupportedThreads() / 2;
   int numThreads = 1;

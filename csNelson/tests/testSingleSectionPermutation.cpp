@@ -20,17 +20,13 @@ struct Variable {
 
   Variable() {}
 
-  void resize(int n) {
-    var = Eigen::VectorXd::LinSpaced(n, 0, n - 1);
-  }
+  void resize(int n) { var = Eigen::VectorXd::LinSpaced(n, 0, n - 1); }
 
-  int size() const {
-    return var.size();
-  }
+  int size() const { return var.size(); }
 };
 
-class Section : public csNelson::SingleSection<Section, Variable, csBlockMatrix::BlockCoeffSparse, double, csBlockMatrix::Variable,
-                                               csBlockMatrix::Dynamic> {
+class Section : public csNelson::SingleSection<Section, Variable, csBlockMatrix::BlockCoeffSparse, double,
+                                               csBlockMatrix::Variable, csBlockMatrix::Dynamic> {
 
   std::vector<Variable> _variables;
   std::vector<int> _sizes;
@@ -47,16 +43,10 @@ public:
     }
   }
 
-  const Variable& parameter(csNelson::NodeId id) const override {
-    return _variables[id.id()];
-  }
-  Variable& parameter(csNelson::NodeId id) override {
-    return _variables[id.id()];
-  }
+  const Variable &parameter(csNelson::NodeId id) const override { return _variables[id.id()]; }
+  Variable &parameter(csNelson::NodeId id) override { return _variables[id.id()]; }
 
-  const std::vector<int>& parameterSize() const {
-    return _sizes;
-  }
+  const std::vector<int> &parameterSize() const { return _sizes; }
 
   virtual ~Section() {}
 };
@@ -68,8 +58,8 @@ class Edge : public Section::EdgeBinary<Edge> {
 
 public:
   void update(bool hessians) override {
-    const auto& v1 = this->parameter_1();
-    const auto& v2 = this->parameter_2();
+    const auto &v1 = this->parameter_1();
+    const auto &v2 = this->parameter_2();
 
     int minN = std::min(v1.size(), v2.size());
 
@@ -85,12 +75,11 @@ public:
   }
 
   template <class Derived1, class Derived2>
-  void updateH11Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& b) {
+  void updateH11Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &b) {
     H.noalias() += J1.transpose() * J1;
     b.noalias() += J1.transpose() * err;
   }
-  template <class Derived>
-  void updateH12Block(Eigen::MatrixBase<Derived>& H, bool transpose) {
+  template <class Derived> void updateH12Block(Eigen::MatrixBase<Derived> &H, bool transpose) {
     if (!transpose) {
       H.noalias() += J1.transpose() * J2;
     } else {
@@ -98,7 +87,7 @@ public:
     }
   }
   template <class Derived1, class Derived2>
-  void updateH22Block(Eigen::MatrixBase<Derived1>& H, Eigen::MatrixBase<Derived2>& b) {
+  void updateH22Block(Eigen::MatrixBase<Derived1> &H, Eigen::MatrixBase<Derived2> &b) {
     H.noalias() += J2.transpose() * J2;
     b.noalias() += J2.transpose() * err;
   }
@@ -125,9 +114,7 @@ TEST_CASE("TestSingleSectionPermutation", "[]") {
     std::random_shuffle(order.data(), order.data() + order.size());
     s.setUser2InternalIndexes(order);
   }
-  SECTION("amd-permute") {
-    s.permuteAMD();
-  }
+  SECTION("amd-permute") { s.permuteAMD(); }
   SECTION("standard") {}
 
   s.structureReady();

@@ -4,16 +4,14 @@
 #include <csNelson/testDoubleSectionSchurCommon_impl.hpp>
 
 template <int matTypeUv, int matTypeVv, int matTypeWv>
-class Points2d3dVFFF : public Points2d3dBase<Points2d3dVFFF<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
-                                             csBlockMatrix::Variable, Point3d::blockSize, numPoints2d, numPoints3d> {
+class Points2d3dVFFF
+    : public Points2d3dBase<Points2d3dVFFF<matTypeUv, matTypeVv, matTypeWv>, matTypeUv, matTypeVv, matTypeWv,
+                            csBlockMatrix::Variable, Point3d::blockSize, numPoints2d, numPoints3d> {
   std::vector<int> u_sizes;
 
 public:
-  Points2d3dVFFF()
-      : u_sizes(numPoints2d, Point2d::blockSize) {}
-  const std::vector<int>& parameterUSize(void) const override {
-    return u_sizes;
-  }
+  Points2d3dVFFF() : u_sizes(numPoints2d, Point2d::blockSize) {}
+  const std::vector<int> &parameterUSize(void) const override { return u_sizes; }
 };
 
 using PointsSectionVFFF_DenseDiagoDense =
@@ -49,12 +47,15 @@ using PointsSectionVFFF_SpacoDiagoSpars =
 using PointsSectionVFFF_SpacoDiagoSpaco =
     Points2d3dVFFF<csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse>;
 
-TEMPLATE_TEST_CASE("DoubleSection-VFFF", "[DoubleSection-VFFF]", PointsSectionVFFF_DenseDiagoDense, PointsSectionVFFF_DenseDiagoDiago,
-                   PointsSectionVFFF_DenseDiagoSpars, PointsSectionVFFF_DenseDiagoSpaco, PointsSectionVFFF_DiagoDiagoDense,
-                   PointsSectionVFFF_DiagoDiagoDiago, PointsSectionVFFF_DiagoDiagoSpars, PointsSectionVFFF_DiagoDiagoSpaco,
-                   PointsSectionVFFF_SparsDiagoDense, PointsSectionVFFF_SparsDiagoDiago, PointsSectionVFFF_SparsDiagoSpars,
-                   PointsSectionVFFF_SparsDiagoSpaco, PointsSectionVFFF_SpacoDiagoDense, PointsSectionVFFF_SpacoDiagoDiago,
-                   PointsSectionVFFF_SpacoDiagoSpars, PointsSectionVFFF_SpacoDiagoSpaco) {
+TEMPLATE_TEST_CASE("DoubleSection-VFFF", "[DoubleSection-VFFF]", PointsSectionVFFF_DenseDiagoDense,
+                   PointsSectionVFFF_DenseDiagoDiago, PointsSectionVFFF_DenseDiagoSpars,
+                   PointsSectionVFFF_DenseDiagoSpaco, PointsSectionVFFF_DiagoDiagoDense,
+                   PointsSectionVFFF_DiagoDiagoDiago, PointsSectionVFFF_DiagoDiagoSpars,
+                   PointsSectionVFFF_DiagoDiagoSpaco, PointsSectionVFFF_SparsDiagoDense,
+                   PointsSectionVFFF_SparsDiagoDiago, PointsSectionVFFF_SparsDiagoSpars,
+                   PointsSectionVFFF_SparsDiagoSpaco, PointsSectionVFFF_SpacoDiagoDense,
+                   PointsSectionVFFF_SpacoDiagoDiago, PointsSectionVFFF_SpacoDiagoSpars,
+                   PointsSectionVFFF_SpacoDiagoSpaco) {
 
   testFunction<TestType, csNelson::GaussNewton>();
   testFunction<TestType, csNelson::LevenbergMarquardt>();

@@ -18,11 +18,10 @@ protected:
 
 public:
   class EdgeUIDSetter final : public EdgeUIDSetterInterface {
-    EdgeUnaryBase* _e;
+    EdgeUnaryBase *_e;
 
   public:
-    EdgeUIDSetter(EdgeUnaryBase* e)
-        : _e(e) {}
+    EdgeUIDSetter(EdgeUnaryBase *e) : _e(e) {}
 
     void setUID(int uid) override;
   };
@@ -30,36 +29,27 @@ public:
   EdgeUnaryBase();
   virtual ~EdgeUnaryBase();
 
-  NodeId parId() const {
-    return _parId;
-  }
+  NodeId parId() const { return _parId; }
 
-  int HUid() const {
-    return _H_uid;
-  }
+  int HUid() const { return _H_uid; }
 };
 
 //--------------------------------------------------------------------------------------------------------
 
-template <class Section>
-class EdgeUnarySectionBase : public EdgeUnaryBase, public EdgeSectionBase<Section> {
+template <class Section> class EdgeUnarySectionBase : public EdgeUnaryBase, public EdgeSectionBase<Section> {
 
-  template <class Derived, class ParT, int matTypeV, class T, int B, int NB>
-  friend class SingleSection;
-  template <class Derived, class ParUT, class ParVT, int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv, int BVv, int NBUv,
-            int NBVv>
+  template <class Derived, class ParT, int matTypeV, class T, int B, int NB> friend class SingleSection;
+  template <class Derived, class ParUT, class ParVT, int matTypeUv, int matTypeVv, int matTypeWv, class Tv, int BUv,
+            int BVv, int NBUv, int NBVv>
   friend class DoubleSection;
 
   class HessianUpdater : public EdgeHessianUpdater {
-    EdgeUnarySectionBase* _e;
+    EdgeUnarySectionBase *_e;
 
   public:
-    HessianUpdater(EdgeUnarySectionBase* e)
-        : _e(e) {}
+    HessianUpdater(EdgeUnarySectionBase *e) : _e(e) {}
 
-    void updateH(bool transpose) override {
-      _e->updateH(transpose);
-    }
+    void updateH(bool transpose) override { _e->updateH(transpose); }
   };
 
 public:
@@ -77,7 +67,7 @@ template <class Section, class SectionAdapter, class Derived>
 class EdgeUnarySectionBaseCRPT : public EdgeUnarySectionBase<Section> {
 
 public:
-  inline const typename SectionAdapter::ParameterType& parameter() const {
+  inline const typename SectionAdapter::ParameterType &parameter() const {
     return SectionAdapter::parameter(this->section(), this->parId());
   }
 
@@ -87,7 +77,7 @@ public:
 
     typename SectionAdapter::HBlockType bH = SectionAdapter::HBlock(this->section(), this->HUid());
     typename SectionAdapter::BSegmentType bV = SectionAdapter::bSegment(this->section(), this->parId().id());
-    static_cast<Derived*>(this)->updateHBlock(bH, bV);
+    static_cast<Derived *>(this)->updateHBlock(bH, bV);
   }
 };
 

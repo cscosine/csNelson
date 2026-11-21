@@ -15,14 +15,14 @@
 namespace csNelson {
 
 template <int matWType, class T, int BR, int BC, int NBR, int NBC>
-void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::prepare(const MatType& W,
-                                                                 const Eigen::SparseMatrix<int, Eigen::RowMajor>* spWmat) {
+void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::prepare(
+    const MatType &W, const Eigen::SparseMatrix<int, Eigen::RowMajor> *spWmat) {
   Eigen::SparseMatrix<int, Eigen::RowMajor> spMat_compute;
   if (spWmat == nullptr) {
     spMat_compute = W.sparsityPattern().toSparseMatrix();
     spWmat = &spMat_compute;
   }
-  const Eigen::SparseMatrix<int, Eigen::RowMajor>& spMat = *spWmat;
+  const Eigen::SparseMatrix<int, Eigen::RowMajor> &spMat = *spWmat;
 
   Eigen::Matrix<int, 1, NBC> counts = Eigen::Matrix<int, 1, NBC>::Zero(W.numBlocksCol());
   for (int r = 0; r < spMat.outerSize(); ++r) {
@@ -47,11 +47,11 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::prepare(const MatType& 
 }
 
 template <int matWType, class T, int BR, int BC, int NBR, int NBC>
-void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(const MatType& W,
-                                                                            const csBlockMatrix::VectorBlock<T, BR, NBR>& v,
-                                                                            csBlockMatrix::VectorBlock<T, BC, NBC>& res) const {
+void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(
+    const MatType &W, const csBlockMatrix::VectorBlock<T, BR, NBR> &v,
+    csBlockMatrix::VectorBlock<T, BC, NBC> &res) const {
 
-  const auto& settings = _settings;
+  const auto &settings = _settings;
 
   const int chunkSize = settings.chunkSize();
   const int numEval = int(W.numBlocksRow());
@@ -67,14 +67,14 @@ void MatrixWtXMultiplier<matWType, T, BR, BC, NBR, NBC>::rightMultVectorSub(cons
     // static
     if (settings.schedule() == ParallelSchedule::schedule_static) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -83,14 +83,14 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(static, c
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_dynamic) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -99,14 +99,14 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(dynamic, 
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_guided) {
       if (settings.isChunkAuto()) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
           }
         }
       } else {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
+        CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, chunkSize))
         for (int i = 0; i < _blocks.size(); ++i) {
           for (int j = 0; j < _blocks[i].size(); ++j) {
             res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);
@@ -114,7 +114,7 @@ CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(guided, c
         }
       }
     } else if (settings.schedule() == ParallelSchedule::schedule_runtime) {
-CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
+      CS_OMP(parallel for num_threads(reqNumThread) default(shared) schedule(runtime))
       for (int i = 0; i < _blocks.size(); ++i) {
         for (int j = 0; j < _blocks[i].size(); ++j) {
           res.segment(i) -= W.blockByUID(_blocks[i][j].uid).transpose() * v.segment(_blocks[i][j].xid);

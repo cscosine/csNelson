@@ -6,36 +6,35 @@
 
 namespace csNelson {
 
-template <class EigenMatType>
-void SolverCholeskyEigenDense<EigenMatType>::init(EigenMatType& mat) {}
+template <class EigenMatType> void SolverCholeskyEigenDense<EigenMatType>::init(EigenMatType &mat) {}
 
-template <class EigenMatType>
-bool SolverCholeskyEigenDense<EigenMatType>::factorize(EigenMatType& matInput) {
+template <class EigenMatType> bool SolverCholeskyEigenDense<EigenMatType>::factorize(EigenMatType &matInput) {
   this->_ldlt.compute(matInput);
   return this->_ldlt.info() == Eigen::ComputationInfo::Success;
 }
 
 template <class EigenMatType>
 template <class Derived1, class Derived2>
-void SolverCholeskyEigenDense<EigenMatType>::solve(const Eigen::MatrixBase<Derived1>& b, Eigen::MatrixBase<Derived2>& x) {
+void SolverCholeskyEigenDense<EigenMatType>::solve(const Eigen::MatrixBase<Derived1> &b,
+                                                   Eigen::MatrixBase<Derived2> &x) {
   x = this->_ldlt.solve(b);
 }
 
 //---------------------------------------------------------------------------------------------------
 
 template <int matTypeV, class T, int B, int NB>
-void SolverCholeskyDenseBase<matTypeV, T, B, NB>::init(MatType& input, const csBlockMatrix::VectorBlock<T, B, NB>& b) {
+void SolverCholeskyDenseBase<matTypeV, T, B, NB>::init(MatType &input, const csBlockMatrix::VectorBlock<T, B, NB> &b) {
   _denseWrapper.set(&input);
 }
 
-template <int matTypeV, class T, int B, int NB>
-T SolverCholeskyDenseBase<matTypeV, T, B, NB>::maxAbsHDiag() const {
+template <int matTypeV, class T, int B, int NB> T SolverCholeskyDenseBase<matTypeV, T, B, NB>::maxAbsHDiag() const {
   return _denseWrapper.maxAbsDiag();
 }
 
 template <int matTypeV, class T, int B, int NB>
-bool SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(MatType& input, const csBlockMatrix::VectorBlock<T, B, NB>& b,
-                                                                   T relLambda, T absLambda, VecType& result) {
+bool SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(MatType &input,
+                                                                   const csBlockMatrix::VectorBlock<T, B, NB> &b,
+                                                                   T relLambda, T absLambda, VecType &result) {
   _denseWrapper.refresh();
 
   if (relLambda != 0 || absLambda != 0) {
@@ -64,27 +63,29 @@ bool SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(MatType& inpu
 
 template <int matTypeV, class T, int B, int NB>
 template <class Derived>
-const Eigen::Solve<Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
-                   Derived>
-SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::MatrixBase<Derived>& b) const {
+const Eigen::Solve<
+    Eigen::LDLT<typename SolverCholeskyDenseBase<matTypeV, T, B, NB>::DenseWrapperT::MatOutputType, Eigen::Upper>,
+    Derived>
+SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::MatrixBase<Derived> &b) const {
   return this->_ldlt.solve(b);
 }
 
 template <int matTypeV, class T, int B, int NB>
 Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>
-SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::SparseMatrix<T>& b) const {
+SolverCholeskyDenseBase<matTypeV, T, B, NB>::solve(const Eigen::SparseMatrix<T> &b) const {
   return this->_ldlt.solve(Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>(b));
 }
 
 //---------------------------------------------------------------------------------------------------
 
 template <int matTypeV, class T, int B, int NB>
-void SolverCholeskyDense<matTypeV, T, B, NB>::init(MatType& input, const VecType& b) {
+void SolverCholeskyDense<matTypeV, T, B, NB>::init(MatType &input, const VecType &b) {
   SolverCholeskyDenseBase<matTypeV, T, B, NB>::init(input, b);
   _incVector.resize(b.segmentDescriptionCSPtr());
 }
 template <int matTypeV, class T, int B, int NB>
-bool SolverCholeskyDense<matTypeV, T, B, NB>::computeIncrement(MatType& input, const VecType& b, T relLambda, T absLambda) {
+bool SolverCholeskyDense<matTypeV, T, B, NB>::computeIncrement(MatType &input, const VecType &b, T relLambda,
+                                                               T absLambda) {
   return SolverCholeskyDenseBase<matTypeV, T, B, NB>::computeIncrement(input, b, relLambda, absLambda, _incVector);
 }
 

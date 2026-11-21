@@ -12,15 +12,14 @@
 
 constexpr int BC = 3;
 
-template <int matVType>
-void testFunction(const Problem& problem) {
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC, csBlockMatrix::Dynamic,
-                                                        csBlockMatrix::Dynamic>::MatrixType V;
+template <int matVType> void testFunction(const Problem &problem) {
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matVType, double, csBlockMatrix::ColMajor, BC, BC,
+                                                        csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>::MatrixType V;
   csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::SPtr spV(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>(problem.nPoints, problem.nPoints));
   spV->setDiagonal();
-  csBlockMatrix::MatrixBlockDescriptor<BC, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> blockDescriptorV(BC, problem.nPoints,
-                                                                                                                BC, problem.nPoints);
+  csBlockMatrix::MatrixBlockDescriptor<BC, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> blockDescriptorV(
+      BC, problem.nPoints, BC, problem.nPoints);
   V.resize(blockDescriptorV, spV);
   V.setZero();
   for (int bi = 0; bi < V.nonZeroBlocks(); bi++) {
@@ -87,8 +86,8 @@ void testFunction(const Problem& problem) {
   }
 }
 
-int main(int argc, char* argv[]) {
-  const Problem* problemPtr = &ProblemCollections::ladybug_49_7776;
+int main(int argc, char *argv[]) {
+  const Problem *problemPtr = &ProblemCollections::ladybug_49_7776;
   std::unique_ptr<Problem> newProblem;
   if (argc == 2) {
     newProblem.reset(new Problem());
@@ -100,7 +99,7 @@ int main(int argc, char* argv[]) {
       problemPtr = newProblem.get();
     }
   }
-  const Problem& problem = *problemPtr;
+  const Problem &problem = *problemPtr;
   std::cout << problem.toString() << std::endl;
 
   std::cout << "******* csBlockMatrix::BlockDiagonal" << std::endl;

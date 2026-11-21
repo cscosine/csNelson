@@ -14,9 +14,9 @@ constexpr int NBCv = 5;
 
 #define DEBUGOUT if (false)
 
-template <int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType>
-void templateTestFunc() {
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matUType, double, csBlockMatrix::ColMajor, BR, BR, NBR, NBR>::MatrixType U;
+template <int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType> void templateTestFunc() {
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matUType, double, csBlockMatrix::ColMajor, BR, BR, NBR,
+                                                        NBR>::MatrixType U;
   csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::SPtr spU(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>(NBRv, NBRv));
   spU->setDiagonal();
@@ -30,7 +30,8 @@ void templateTestFunc() {
     U.blockByUID(bi).setRandom();
   }
 
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matType, double, csBlockMatrix::RowMajor, BR, BC, NBR, NBC>::MatrixType W;
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matType, double, csBlockMatrix::RowMajor, BR, BC, NBR,
+                                                        NBC>::MatrixType W;
 
   csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::SPtr sp(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>(NBRv, NBCv));
@@ -76,12 +77,8 @@ void templateTestFunc() {
 
   csNelson::MatrixWWtMultiplier<matOutType, double, BR, NBR> mwwt;
 
-  SECTION("SINGLE THREAD") {
-    mwwt.settings().setSingleThread();
-  }
-  SECTION("MULTI THREAD") {
-    mwwt.settings().setNumThreadsMax();
-  }
+  SECTION("SINGLE THREAD") { mwwt.settings().setSingleThread(); }
+  SECTION("MULTI THREAD") { mwwt.settings().setNumThreadsMax(); }
 
   mwwt.prepare(U, W);
   mwwt.multiply(U, W, W);
@@ -110,7 +107,8 @@ void templateTestFunc() {
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWWtMultiplier-Dense", "[MatrixWWtMultiplier-Base]",
-    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC, matOutType),
+    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC,
+     matOutType),
     //***************************************************************************
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
@@ -129,40 +127,62 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
@@ -179,12 +199,12 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDense, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockDense, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockDense),
@@ -197,7 +217,8 @@ TEMPLATE_TEST_CASE_SIG(
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWWtMultiplier-Sparse", "[MatrixWWtMultiplier-Base]",
-    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC, matOutType),
+    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC,
+     matOutType),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
@@ -208,47 +229,68 @@ TEMPLATE_TEST_CASE_SIG(
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
@@ -267,12 +309,12 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockDense),
@@ -285,31 +327,40 @@ TEMPLATE_TEST_CASE_SIG(
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWWtMultiplier-SparseCoeff", "[MatrixWWtMultiplier-Base]",
-    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC, matOutType),
+    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC,
+     matOutType),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
@@ -320,20 +371,25 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
@@ -344,46 +400,48 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse)) {
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockCoeffSparse, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse)) {
   templateTestFunc<matUType, matType, BR, BC, NBR, NBC, matOutType>();
 }
 
 TEMPLATE_TEST_CASE_SIG(
     "MatrixWWtMultiplier-Diagonal", "[MatrixWWtMultiplier-Base]",
-    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC, matOutType),
+    ((int matUType, int matType, int BR, int BC, int NBR, int NBC, int matOutType), matUType, matType, BR, BC, NBR, NBC,
+     matOutType),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
@@ -394,51 +452,68 @@ TEMPLATE_TEST_CASE_SIG(
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, NBCv, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, NBRv, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDense, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
+     csBlockMatrix::BlockSparse),
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, NBCv,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
@@ -457,18 +532,18 @@ TEMPLATE_TEST_CASE_SIG(
     (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
      csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockCoeffSparse, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse),
     //---------------------------------------------------------------------------------
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockDense),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockSparse),
-    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic,
-     csBlockMatrix::BlockCoeffSparse)) {
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockDense),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockSparse),
+    (csBlockMatrix::BlockDiagonal, csBlockMatrix::BlockDiagonal, BRv, BCv, csBlockMatrix::Dynamic,
+     csBlockMatrix::Dynamic, csBlockMatrix::BlockCoeffSparse)) {
   templateTestFunc<matUType, matType, BR, BC, NBR, NBC, matOutType>();
 }

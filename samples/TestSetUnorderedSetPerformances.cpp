@@ -10,8 +10,8 @@
 #include <csBlockMatrix/SparsityPattern.hpp>
 #include <unordered_set>
 
-int main(int argc, char* argv[]) {
-  const Problem* problemPtr = &ProblemCollections::ladybug_49_7776;
+int main(int argc, char *argv[]) {
+  const Problem *problemPtr = &ProblemCollections::ladybug_49_7776;
   std::unique_ptr<Problem> newProblem;
   if (argc == 2) {
     newProblem.reset(new Problem());
@@ -23,13 +23,13 @@ int main(int argc, char* argv[]) {
       problemPtr = newProblem.get();
     }
   }
-  const Problem& problem = *problemPtr;
+  const Problem &problem = *problemPtr;
 
   {
     auto t0 = std::chrono::steady_clock::now();
     std::vector<std::set<int>> sp(problem.nCameras);
     for (int i = 0; i < problem.edges.size(); i++) {
-      const auto& e = problem.edges[i];
+      const auto &e = problem.edges[i];
       sp[e.first].insert(e.second);
     }
     auto t1 = std::chrono::steady_clock::now();
@@ -39,7 +39,7 @@ int main(int argc, char* argv[]) {
     auto t0 = std::chrono::steady_clock::now();
     std::vector<std::unordered_set<int>> sp(problem.nCameras);
     for (int i = 0; i < problem.edges.size(); i++) {
-      const auto& e = problem.edges[i];
+      const auto &e = problem.edges[i];
       sp[e.first].insert(e.second);
     }
     auto t1 = std::chrono::steady_clock::now();
@@ -49,15 +49,18 @@ int main(int argc, char* argv[]) {
       std::sort(sort_set[i].begin(), sort_set[i].end());
     }
     auto t2 = std::chrono::steady_clock::now();
-    std::cout << "edges on std::vector<std::unordered_set<int>> TOT " << std::chrono::duration<double>(t2 - t0).count() << std::endl;
-    std::cout << " -- addition                                      " << std::chrono::duration<double>(t1 - t0).count() << std::endl;
-    std::cout << " -- sort                                          " << std::chrono::duration<double>(t2 - t1).count() << std::endl;
+    std::cout << "edges on std::vector<std::unordered_set<int>> TOT " << std::chrono::duration<double>(t2 - t0).count()
+              << std::endl;
+    std::cout << " -- addition                                      " << std::chrono::duration<double>(t1 - t0).count()
+              << std::endl;
+    std::cout << " -- sort                                          " << std::chrono::duration<double>(t2 - t1).count()
+              << std::endl;
   }
 
   csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::SPtr sp(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>(problem.nCameras, problem.nPoints));
   for (int i = 0; i < problem.edges.size(); i++) {
-    const auto& e = problem.edges[i];
+    const auto &e = problem.edges[i];
     sp->add(e.first, e.second);
   }
 

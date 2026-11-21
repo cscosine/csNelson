@@ -2,8 +2,7 @@
 
 namespace csNelson {
 
-EdgeInterface::EdgeInterface()
-    : _chi2(-1) {}
+EdgeInterface::EdgeInterface() : _chi2(-1) {}
 
 EdgeInterface::~EdgeInterface() {}
 

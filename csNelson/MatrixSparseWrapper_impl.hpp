@@ -8,7 +8,7 @@ template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
 SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
+void SparseWrapper<csBlockMatrix::BlockDense, T, Ordering, BR, BC, NBR, NBC>::set(MatType *matrix) {
   this->_matrix = matrix;
   this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
   this->refresh();
@@ -39,7 +39,7 @@ template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
 SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
+void SparseWrapper<csBlockMatrix::BlockDiagonal, T, Ordering, BR, BC, NBR, NBC>::set(MatType *matrix) {
   this->_matrix = matrix;
   this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
   this->refresh();
@@ -60,7 +60,7 @@ template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
 SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::~SparseWrapper() {}
 
 template <class T, int Ordering, int BR, int BC, int NBR, int NBC>
-void SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType* matrix) {
+void SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::set(MatType *matrix) {
   this->_matrix = matrix;
   this->_matCopy.resize(this->_matrix->blockDescriptor(), this->_matrix->sparsityPatternCSPtr());
   this->refresh();
@@ -81,8 +81,7 @@ void SparseWrapper<csBlockMatrix::BlockSparse, T, Ordering, BR, BC, NBR, NBC>::r
 
 template <int matType, class T, int Ordering, int BR, int NBR>
 SparseSquareWrapper<matType, T, Ordering, BR, NBR>::SparseSquareWrapper()
-    : SparseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>()
-    , _diagonalCoeffIndexesInitialized(false) {
+    : SparseWrapper<matType, T, Ordering, BR, BR, NBR, NBR>(), _diagonalCoeffIndexesInitialized(false) {
   // if it is fixed size
   _diagonalCoeffIndexes.setConstant(-1);
 }
@@ -100,7 +99,7 @@ void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::initDiagonalCoefficient
     int c = 0;
     // detect diagonal blocks
     for (int o = 0; o < this->matBlocks().sparsityPattern().outerSize(); o++) {
-      const auto& innerSet = this->matBlocks().sparsityPattern().inner(o);
+      const auto &innerSet = this->matBlocks().sparsityPattern().inner(o);
       int inCount = innerSet.size() - 1;
       for (auto rit = innerSet.crbegin(); rit != innerSet.crend(); rit++) {
         int in = *rit;
@@ -138,7 +137,7 @@ T SparseSquareWrapper<matType, T, Ordering, BR, NBR>::maxAbsDiag() const {
 
 template <int matType, class T, int Ordering, int BR, int NBR>
 template <class Derived>
-void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived>& dest) const {
+void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::DenseBase<Derived> &dest) const {
   initDiagonalCoefficients(); // lazy
   assert(dest.size() == _diagonalCoeffIndexes.size());
   // in Eigen 3.4 this will be easier with slices!!
@@ -149,7 +148,7 @@ void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::diagonalCopy(Eigen::Den
 
 template <int matType, class T, int Ordering, int BR, int NBR>
 template <class Derived>
-void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived>& values) {
+void SparseSquareWrapper<matType, T, Ordering, BR, NBR>::setDiagonal(const Eigen::DenseBase<Derived> &values) {
   initDiagonalCoefficients(); // lazy
   // in Eigen 3.4 this will be easier with slices!!
   assert(values.size() == _diagonalCoeffIndexes.size());

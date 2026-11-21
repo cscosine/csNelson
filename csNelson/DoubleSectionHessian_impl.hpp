@@ -14,8 +14,7 @@
 namespace csNelson {
 
 template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
-DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::DoubleSectionHessian()
-    : _chi2(0) {}
+DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::DoubleSectionHessian() : _chi2(0) {}
 
 template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
 DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::~DoubleSectionHessian() {}
@@ -23,9 +22,9 @@ DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>:
 template <int matTypeUv, int matTypeWv, int matTypeVv, class Tv, int BUv, int BVv, int NBUv, int NBVv>
 void DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, NBVv>::resize(
     BlockSizeTypeParU blockSizesU, int nBlocksU, BlockSizeTypeParV blockSizesV, int nBlocksV,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spU,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spV,
-    const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr& spW) {
+    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr &spU,
+    const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr &spV,
+    const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr &spW) {
   auto blockDescriptorU = MatTypeU::BlockDescriptor::squareMatrix(blockSizesU, nBlocksU);
   _H.U().resize(blockDescriptorU, spU);
   _b.bU().resize(blockDescriptorU.rowDescriptionCSPtr());
@@ -34,8 +33,8 @@ void DoubleSectionHessian<matTypeUv, matTypeWv, matTypeVv, Tv, BUv, BVv, NBUv, N
   _H.V().resize(blockDescriptorV, spV);
   _b.bV().resize(blockDescriptorV.rowDescriptionCSPtr());
 
-  auto blockDescriptorW =
-      typename MatTypeW::BlockDescriptor(blockDescriptorU.rowDescriptionCSPtr(), blockDescriptorV.colDescriptionCSPtr());
+  auto blockDescriptorW = typename MatTypeW::BlockDescriptor(blockDescriptorU.rowDescriptionCSPtr(),
+                                                             blockDescriptorV.colDescriptionCSPtr());
   _H.W().resize(blockDescriptorW, spW);
 }
 

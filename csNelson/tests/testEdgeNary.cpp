@@ -17,8 +17,7 @@ struct Edge2 : public csNelson::EdgeNaryBase<2> {
 
 struct EdgeD : public csNelson::EdgeNaryBase<csBlockMatrix::Dynamic> {
 
-  EdgeD(int n)
-      : csNelson::EdgeNaryBase<csBlockMatrix::Dynamic>(n) {}
+  EdgeD(int n) : csNelson::EdgeNaryBase<csBlockMatrix::Dynamic>(n) {}
 
   void update(bool updateHessians) override {}
 };
@@ -31,16 +30,10 @@ class Section : public csNelson::SingleSection<Section, Element, csBlockMatrix::
   std::vector<Element> _elements;
 
 public:
-  Section() {
-    this->parametersReady();
-  }
+  Section() { this->parametersReady(); }
 
-  virtual const Element& parameter(csNelson::NodeId i) const {
-    return _elements[i.id()];
-  }
-  virtual Element& parameter(csNelson::NodeId i) {
-    return _elements[i.id()];
-  }
+  virtual const Element &parameter(csNelson::NodeId i) const { return _elements[i.id()]; }
+  virtual Element &parameter(csNelson::NodeId i) { return _elements[i.id()]; }
 };
 
 struct Edge1_S : public csNelson::EdgeNarySectionBase<Section, 1> {
@@ -59,8 +52,7 @@ struct Edge2_S : public csNelson::EdgeNarySectionBase<Section, 2> {
 
 struct EdgeD_S : public csNelson::EdgeNarySectionBase<Section, csBlockMatrix::Dynamic> {
 
-  EdgeD_S(int n)
-      : csNelson::EdgeNarySectionBase<Section, csBlockMatrix::Dynamic>(n) {}
+  EdgeD_S(int n) : csNelson::EdgeNarySectionBase<Section, csBlockMatrix::Dynamic>(n) {}
 
   void update(bool updateHessians) override {}
 
@@ -72,42 +64,40 @@ struct Edge1_SC : public Section::EdgeNary<Edge1_SC, 1> {
 
   void update(bool updateHessians) override {}
 
-  template <class Derived>
-  void updateHBlock(int i, int j, Eigen::MatrixBase<Derived>& Hij, bool transpose) {
+  template <class Derived> void updateHBlock(int i, int j, Eigen::MatrixBase<Derived> &Hij, bool transpose) {
     // with <1> will never be called
   }
 
   template <class Derived1, class Derived2>
-  void updateHBlock(int i, Eigen::MatrixBase<Derived1>& Hij, Eigen::MatrixBase<Derived2>& b) {}
+  void updateHBlock(int i, Eigen::MatrixBase<Derived1> &Hij, Eigen::MatrixBase<Derived2> &b) {}
 };
 
 struct Edge2_SC : public csNelson::EdgeNarySectionBaseCRPT<Section, 2, Section::EdgeUnaryAdapter, Edge2_SC> {
 
   void update(bool updateHessians) override {}
 
-  template <class Derived>
-  void updateHBlock(int i, int j, Eigen::MatrixBase<Derived>& Hij, bool transpose) {
+  template <class Derived> void updateHBlock(int i, int j, Eigen::MatrixBase<Derived> &Hij, bool transpose) {
     // with <1> will never be called
   }
 
   template <class Derived1, class Derived2>
-  void updateHBlock(int i, Eigen::MatrixBase<Derived1>& Hij, Eigen::MatrixBase<Derived2>& b) {}
+  void updateHBlock(int i, Eigen::MatrixBase<Derived1> &Hij, Eigen::MatrixBase<Derived2> &b) {}
 };
 
-struct EdgeD_SC : public csNelson::EdgeNarySectionBaseCRPT<Section, csBlockMatrix::Dynamic, Section::EdgeUnaryAdapter, EdgeD_SC> {
+struct EdgeD_SC
+    : public csNelson::EdgeNarySectionBaseCRPT<Section, csBlockMatrix::Dynamic, Section::EdgeUnaryAdapter, EdgeD_SC> {
 
   EdgeD_SC(int n)
       : csNelson::EdgeNarySectionBaseCRPT<Section, csBlockMatrix::Dynamic, Section::EdgeUnaryAdapter, EdgeD_SC>(n) {}
 
   void update(bool updateHessians) override {}
 
-  template <class Derived>
-  void updateHBlock(int i, int j, Eigen::MatrixBase<Derived>& Hij, bool transpose) {
+  template <class Derived> void updateHBlock(int i, int j, Eigen::MatrixBase<Derived> &Hij, bool transpose) {
     // with <1> will never be called
   }
 
   template <class Derived1, class Derived2>
-  void updateHBlock(int i, Eigen::MatrixBase<Derived1>& Hij, Eigen::MatrixBase<Derived2>& b) {}
+  void updateHBlock(int i, Eigen::MatrixBase<Derived1> &Hij, Eigen::MatrixBase<Derived2> &b) {}
 };
 
 TEST_CASE("testEdgeNary", "[testEdgeNary]") {

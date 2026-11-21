@@ -22,9 +22,7 @@ protected:
   struct SetterComputer {
     std::unique_ptr<EdgeUIDSetterInterface> setter;
     std::unique_ptr<EdgeHessianUpdater> computer;
-    SetterComputer(EdgeUIDSetterInterface* s, EdgeHessianUpdater* c)
-        : setter(s)
-        , computer(c) {}
+    SetterComputer(EdgeUIDSetterInterface *s, EdgeHessianUpdater *c) : setter(s), computer(c) {}
     SetterComputer() {}
   };
 
@@ -32,34 +30,28 @@ protected:
     std::forward_list<SetterComputer> list;
     int size;
     bool transpose;
-    ListWithCount()
-        : size(0)
-        , transpose(false) {}
+    ListWithCount() : size(0), transpose(false) {}
   };
 
   std::vector<std::unique_ptr<EdgeInterface>> _edgesVector;
 
-  // outer size is the number of independent computation, safe to be computed in parallel, inside they have to go sequential (or
-  // parallel but with reduction)
+  // outer size is the number of independent computation, safe to be computed in parallel, inside they have to go
+  // sequential (or parallel but with reduction)
   struct UpdaterVectorWithTransposeFlag {
     std::vector<std::unique_ptr<EdgeHessianUpdater>> updaters;
     bool transpose;
   };
   std::vector<UpdaterVectorWithTransposeFlag> _computationUnits;
 
-  void updateHessianBlocks(const ParallelExecSettings& hessianUpdateParallelSettings);
-  void evaluateEdges(const ParallelExecSettings& edgeEvalParallelSettings, bool hessian);
+  void updateHessianBlocks(const ParallelExecSettings &hessianUpdateParallelSettings);
+  void evaluateEdges(const ParallelExecSettings &edgeEvalParallelSettings, bool hessian);
 
   virtual void setChi2(double v) = 0;
 
 public:
-  void reserveEdges(int n) {
-    _edgesVector.reserve(n);
-  }
+  void reserveEdges(int n) { _edgesVector.reserve(n); }
 
-  int numEdges() const {
-    return int(_edgesVector.size());
-  }
+  int numEdges() const { return int(_edgesVector.size()); }
 };
 
 } // namespace csNelson

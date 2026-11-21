@@ -67,65 +67,33 @@ public:
   virtual ~DoubleSectionHessian();
 
   void resize(BlockSizeTypeParU blockSizesU, int nBlocksU, BlockSizeTypeParV blockSizesV, int nBlocksV,
-              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spU,
-              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr& spV,
-              const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr& spW);
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr &spU,
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::ColMajor>::CSPtr &spV,
+              const csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::CSPtr &spW);
 
-  HessianMatricesT& H() {
-    return _H;
-  }
-  const HessianMatricesT& H() const {
-    return _H;
-  }
+  HessianMatricesT &H() { return _H; }
+  const HessianMatricesT &H() const { return _H; }
 
-  HessianVectorsT& b() {
-    return _b;
-  }
-  const HessianVectorsT& b() const {
-    return _b;
-  }
+  HessianVectorsT &b() { return _b; }
+  const HessianVectorsT &b() const { return _b; }
 
-  inline void setChi2(double chi2) {
-    this->_chi2 = chi2;
-  }
+  inline void setChi2(double chi2) { this->_chi2 = chi2; }
 
-  inline double chi2() const {
-    return _chi2;
-  }
+  inline double chi2() const { return _chi2; }
 
-  inline const MatTypeU& U() const {
-    return _H.U();
-  }
-  inline const MatTypeV& V() const {
-    return _H.V();
-  }
-  inline const MatTypeW& W() const {
-    return _H.W();
-  }
+  inline const MatTypeU &U() const { return _H.U(); }
+  inline const MatTypeV &V() const { return _H.V(); }
+  inline const MatTypeW &W() const { return _H.W(); }
 
-  inline MatTypeU& U() {
-    return _H.U();
-  }
-  inline MatTypeV& V() {
-    return _H.V();
-  }
-  inline MatTypeW& W() {
-    return _H.W();
-  }
+  inline MatTypeU &U() { return _H.U(); }
+  inline MatTypeV &V() { return _H.V(); }
+  inline MatTypeW &W() { return _H.W(); }
 
-  inline const VecTypeU& bU() const {
-    return _b.bU();
-  }
-  inline const VecTypeV& bV() const {
-    return _b.bV();
-  }
+  inline const VecTypeU &bU() const { return _b.bU(); }
+  inline const VecTypeV &bV() const { return _b.bV(); }
 
-  inline VecTypeU& bU() {
-    return _b.bU();
-  }
-  inline VecTypeV& bV() {
-    return _b.bV();
-  }
+  inline VecTypeU &bU() { return _b.bU(); }
+  inline VecTypeV &bV() { return _b.bV(); }
 
   void clearAll();
 

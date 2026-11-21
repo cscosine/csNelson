@@ -14,20 +14,19 @@
 constexpr int BR = 6;
 constexpr int BC = 3;
 
-template <int matWType>
-void testFunction(const Problem& problem) {
+template <int matWType> void testFunction(const Problem &problem) {
 
-  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic,
-                                                        csBlockMatrix::Dynamic>::MatrixType W;
+  typename csBlockMatrix::MatrixBlockIterableTypeTraits<matWType, double, csBlockMatrix::RowMajor, BR, BC,
+                                                        csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>::MatrixType W;
   csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>::SPtr sp(
       new csBlockMatrix::SparsityPattern<csBlockMatrix::RowMajor>(problem.nCameras, problem.nPoints));
   for (int i = 0; i < problem.edges.size(); i++) {
-    const auto& e = problem.edges[i];
+    const auto &e = problem.edges[i];
     sp->add(e.first, e.second);
   }
 
-  W.resize(csBlockMatrix::MatrixBlockDescriptor<BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(BR, problem.nCameras, BC,
-                                                                                                        problem.nPoints),
+  W.resize(csBlockMatrix::MatrixBlockDescriptor<BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic>(
+               BR, problem.nCameras, BC, problem.nPoints),
            sp);
   W.setZero();
   for (int bi = 0; bi < W.nonZeroBlocks(); bi++) {
@@ -135,7 +134,9 @@ void testFunction(const Problem& problem) {
   // standard
   {
     auto t0c = std::chrono::steady_clock::now();
-    csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic, csBlockMatrix::Dynamic> W_Wrap;
+    csNelson::SparseWrapper<matWType, double, csBlockMatrix::RowMajor, BR, BC, csBlockMatrix::Dynamic,
+                            csBlockMatrix::Dynamic>
+        W_Wrap;
     W_Wrap.set(&W);
     auto t1c = std::chrono::steady_clock::now();
     double t_copy = std::chrono::duration<double>(t1c - t0c).count();
@@ -160,7 +161,8 @@ void testFunction(const Problem& problem) {
 
   Eigen::VectorXd diff = bV2.mat() - bV.mat();
 
-  std::cout << "Eigen::NumTraits<double>::dummy_precision() " << Eigen::NumTraits<double>::dummy_precision() << std::endl;
+  std::cout << "Eigen::NumTraits<double>::dummy_precision() " << Eigen::NumTraits<double>::dummy_precision()
+            << std::endl;
 
   double maxErr = diff.cwiseAbs().maxCoeff();
   bool ok = maxErr < 16 * Eigen::NumTraits<double>::dummy_precision();
@@ -172,8 +174,8 @@ void testFunction(const Problem& problem) {
   }
 }
 
-int main(int argc, char* argv[]) {
-  const Problem* problemPtr = &ProblemCollections::ladybug_49_7776;
+int main(int argc, char *argv[]) {
+  const Problem *problemPtr = &ProblemCollections::ladybug_49_7776;
   std::unique_ptr<Problem> newProblem;
   if (argc == 2) {
     newProblem.reset(new Problem());
@@ -185,7 +187,7 @@ int main(int argc, char* argv[]) {
       problemPtr = newProblem.get();
     }
   }
-  const Problem& problem = *problemPtr;
+  const Problem &problem = *problemPtr;
 
   std::cout << "------------------- W with blocks -------------------" << std::endl;
   testFunction<csBlockMatrix::BlockSparse>(problem);
