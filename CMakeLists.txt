@@ -4,7 +4,7 @@ cmake_minimum_required(VERSION 3.31)
 include(csCMakeSetup)
 cs_macos_deployment_target(13.3)
 
-project(csNelsonSol VERSION 1.0.0 LANGUAGES CXX)
+project(csNelsonSol VERSION 0.1.0 LANGUAGES CXX)
 
 # add the csCMake system
 include(csCMake)
